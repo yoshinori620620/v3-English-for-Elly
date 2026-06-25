@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☆さっくんの！サクサク推し英語 - アクションゲーム版☆</title>
+    <style>
+        :root {
+            --primary-color: #FF69B4; 
+            --success-color: #2ECC71;
+            --error-color: #E74C3C;
+            --background-color: #FFF0F5; 
+            --text-color: #333;
+        }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--background-color); margin: 0; padding: 10px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; box-sizing: border-box; overflow-x: hidden; }
+        .game-container { background-color: white; border-radius: 20px; box-shadow: 0 12px 30px rgba(255, 105, 180, 0.2); padding: 15px; width: 100%; max-width: 440px; box-sizing: border-box; border: 3px solid #FFB6C1; text-align: center; }
+        
+        .app-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px dashed #FFB6C1; }
+        .back-portal-btn { background-color: #FF1493; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .score-board { background-color: var(--primary-color); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+
+        /* 🎮 ゲーム画面のキャンバス */
+        #gameCanvas { background: linear-gradient(to bottom, #87CEEB, #E0F6FF); border: 2px solid #333; border-radius: 12px; display: block; margin: 0 auto; max-width: 100%; cursor: pointer; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+        
+        .hint-banner { background-color: #FFF5F7; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 14px; margin-bottom: 10px; border-left: 5px solid var(--primary-color); text-align: left; }
+        .instructions { font-size: 11px; color: #7F8C8D; margin-top: 5px; font-weight: bold; }
+
+        /* 👑 ポップアップ（解説・結果用） */
+        .overlay { display: none; margin-top: 15px; padding: 15px; border-radius: 12px; background-color: #F8FAFC; border: 2px solid #FFB6C1; animation: fadeIn 0.3s ease; text-align: left; }
+        .overlay-title { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .overlay.correct { border-color: var(--success-color); background-color: #E8F8F5; color: #117A65; }
+        .overlay.incorrect { border-color: var(--error-color); background-color: #FDEDEC; color: #922B21; }
+        .feedback-detail { font-size: 13px; line-height: 1.5; color: #333; margin-top: 8px; }
+        
+        .action-btn { margin-top: 12px; width: 100%; background-color: #FF1493; color: white; border: none; padding: 12px; font-size: 15px; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .action-btn:hover { background-color: #C71585; }
+        
+        .audio-speech-btn { width: 100%; padding: 8px; font-size: 12px; font-weight: bold; border-radius: 6px; border: 1px solid #FFB6C1; background-color: #FFF; color: #FF1493; cursor: pointer; margin-top: 5px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="app-nav">
+        <button class="back-portal-btn" onclick="goToPortal()">🚪 Portalに戻る</button>
+        <div class="score-board" id="score-display">SCORE: 0</div>
+    </div>
+
+    <div class="hint-banner" id="current-hint">お題の日本語を読み込み中...</div>
+
+    <canvas id="gameCanvas" width="400" height="240"></canvas>
+    <div class="instructions">【操作】画面をタップ（クリック）すると「さっくん（ピンクの丸）」がピョンと跳ねるよ！</div>
+
+    <div id="feedback-overlay" class="overlay">
+        <div class="overlay-title" id="overlay-title">結果</div>
+        <div id="idol-message" style="font-weight: bold; font-size: 14px; margin-bottom: 5px;"></div>
+        <button class="audio-speech-btn" onclick="speakEnglish()">🔊 英文のネイティブ発音を聴く</button>
+        <div class="feedback-detail" id="feedback-content"></div>
+        <button class="action-btn" id="next-question-btn" onclick="reviveAndNext()">次の問題へ進む 👉</button>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // 英検3級厳選クイズプール
+    const quizPool = [
+        { id: 1, meaning: "【重要単語】名詞", word: "century (世紀)", q: "This castle was built in the 15th ______.", a: "century", o: ["century", "culture", "season"], t: "このお城は15世紀に建てられました。", ex: "centuryは「世紀」「100年間」を意味する名詞。15th centuryで「15世紀」になります。" },
+        { id: 2, meaning: "【重要単語】動詞", word: "agree (同意する)", q: "I ______ with your plan. Let's do it.", a: "agree", o: ["agree", "decide", "complain"], t: "私はあなたの計画に同意します。それをやりましょう。", ex: "agree with 〜 で「〜に同意する、賛成する」という最頻出パターンです。" },
+        { id: 3, meaning: "【重要熟語】動作", word: "take part in (参加する)", q: "Many students will take ______ in the school festival.", a: "part", o: ["care", "part", "place"], t: "たくさんの生徒が文化祭に参加する予定です。", ex: "take part in 〜 で「〜に参加する」となります。joinと同じ意味です。" },
+        { id: 4, meaning: "【重要熟語】会話", word: "look forward to (楽しみに待つ)", q: "I am looking forward ______ seeing you next week.", a: "to", o: ["for", "to", "at"], t: "来週あなたに会えるのを楽しみにしています。", ex: "look forward to 〜 の後ろには動詞のing形（動名詞）が続きます。" },
+        { id: 5, meaning: "【重要文法】現在完了形", word: "has lived (ずっと住んでいる)", q: "Ken ______ lived in Tokyo for five years.", a: "has", o: ["has", "have", "is"], t: "ケンは5年間ずっと東京に住んでいます。", ex: "「have/has + 過去分詞」で現在完了形を作ります。Kenは三人称単数なのでhasが正解。" }
+    ];
+
+    // アイドル台詞データベース
+    const idols = [
+        { name: "佐久間大介(Snow Man)", correct: "最っ高！天才じゃん！空中キャッチ大成功！🩷", incorrect: "あちゃーどんまい！さっくんが応援してるから次で絶対リベンジだ！💪" },
+        { name: "目黒蓮(Snow Man)", correct: "正解。ナイスキャッチ。頑張ってるの、見てたよ。🖤", incorrect: "おしい。焦らなくて大丈夫。次、俺と一緒に獲りにいこう。" },
+        { name: "ジェシー(SixTONES)", correct: "大正解！ズドン！！最高にキマったね！❤️", incorrect: "ドンマイ！次は絶対いけるからスマイルで行こう！ズドン！" }
+    ];
+
+    // ゲーム内オブジェクト状態
+    let bird = { x: 50, y: 100, radius: 12, gravity: 0.4, lift: -5.5, velocity: 0 };
+    let items = [];
+    let obstacles = [];
+    let gameScore = 0;
+    let currentQuizIndex = 0;
+    let gameState = "PLAYING"; // "PLAYING", "HIT_FEEDBACK"
+    let itemSpawnTimer = 0;
+    let obsSpawnTimer = 0;
+    let selectedIdol = idols[0];
+
+    // クイズデータの全300問ダミー拡張
+    const fullQuizPool = [];
+    for(let i = 1; i <= 300; i++) {
+        let template = quizPool[(i - 1) % quizPool.length];
+        fullQuizPool.push({
+            ...template,
+            id: i,
+            meaning: i > 5 ? `【重要テーマ】No.${i}` : template.meaning
+        });
+    }
+
+    // イベントリスナー（スマホのタップ・PCのクリック両方に対応）
+    window.addEventListener("touchstart", function(e) {
+        if(e.target === canvas) { e.preventDefault(); flap(); }
+    }, {passive: false});
+    canvas.addEventListener("click", flap);
+
+    function flap() {
+        if (gameState === "PLAYING") {
+            bird.velocity = bird.lift;
+        }
+    }
+
+    function setupQuestion() {
+        const qData = fullQuizPool[currentQuizIndex];
+        document.getElementById("current-hint").innerText = `【第${qData.id}問】${qData.meaning} ➔ 空中の正解をキャッチして！\n「${qData.t}」\n${qData.sentence}`;
+        
+        items = [];
+        obstacles = [];
+        // 3つの選択肢をランダムな高さの空中アイテムとして登録
+        let shuffledOptions = [...qData.options].sort(() => Math.random() - 0.5);
+        shuffledOptions.forEach((text, index) => {
+            items.push({
+                x: 400 + (index * 110),
+                y: 50 + (Math.random() * 100),
+                text: text,
+                isAnswer: (text === qData.a),
+                width: 70,
+                height: 25
+            });
+        });
+        
+        // 障害物を1つ配置
+        obstacles.push({
+            x: 550,
+            y: 80 + Math.random() * 80,
+            width: 20,
+            height: 40
+        });
+
+        // 応援アイドルをランダム選出
+        selectedIdol = idols[Math.floor(Math.random() * idols.length)];
+    }
+
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function update() {
+        if (gameState !== "PLAYING") return;
+
+        // さっくんの物理演算
+        bird.velocity += bird.gravity;
+        bird.y += bird.velocity;
+
+        // 天井と床の衝突判定
+        if (bird.y + bird.radius > canvas.height) {
+            bird.y = canvas.height - bird.radius;
+            bird.velocity = 0;
+        }
+        if (bird.y - bird.radius < 0) {
+            bird.y = bird.radius;
+            bird.velocity = 0;
+        }
+
+        // アイテム（単語雲）の移動と衝突判定
+        items.forEach(item => {
+            item.x -= 1.8; // 左スクロールスピード
+
+            // 衝突判定（簡易矩形判定）
+            if (bird.x + bird.radius > item.x && bird.x - bird.radius < item.x + item.width &&
+                bird.y + bird.radius > item.y && bird.y - bird.radius < item.y + item.height) {
+                
+                if (item.isAnswer) {
+                    triggerFeedback(true); // 正解アイテムキャッチ！
+                } else {
+                    triggerFeedback(false); // 不正解アイテムキャッチ…
+                }
+            }
+        });
+
+        // 障害物（トゲトゲの岩）の移動と衝突
+        obstacles.forEach(obs => {
+            obs.x -= 1.8;
+            if (bird.x + bird.radius > obs.x && bird.x - bird.radius < obs.x + obs.width &&
+                bird.y + bird.radius > obs.y && bird.y - bird.radius < obs.y + obs.height) {
+                triggerFeedback(false); // 障害物に当たったら不正解扱いとして解説を出す
+            }
+        });
+
+        // 全アイテムが画面外に消えたら自動リローデッド
+        if (items.length > 0 && items[items.length - 1].x < -100) {
+            setupQuestion();
+        }
+    }
+
+    function draw() {
+        // 背景クリア
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 背景の雲を描く（ポップな装飾）
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.beginPath(); ctx.arc(300, 40, 20, 0, Math.PI*2); ctx.arc(320, 45, 15, 0, Math.PI*2); ctx.fill();
+
+        // 障害物を描く（グレーの四角）
+        ctx.fillStyle = "#7F8C8D";
+        obstacles.forEach(obs => {
+            ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            ctx.fillStyle = "#333";
+            ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+        });
+
+        // 単語アイテム（雲のボタン風）を描く
+        items.forEach(item => {
+            ctx.fillStyle = "#FFFFFF";
+            ctx.strokeStyle = "#FF69B4";
+            ctx.lineWidth = 2;
+            // 角丸四角形
+            ctx.beginPath();
+            ctx.roundRect(item.x, item.y, item.width, item.height, 8);
+            ctx.fill(); ctx.stroke();
+
+            // 文字描画
+            ctx.fillStyle = "#333";
+            ctx.font = "bold 13px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(item.text, item.x + item.width / 2, item.y + 17);
+        });
+
+        // プレイヤー「さっくん」を描く（ピンクリボン付きの丸球）
+        ctx.fillStyle = "#FF69B4";
+        ctx.beginPath();
+        ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#FFF";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // さっくんの顔（可愛いドット目）
+        ctx.fillStyle = "#FFF";
+        ctx.beginPath(); ctx.arc(bird.x + 4, bird.y - 2, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#333";
+        ctx.beginPath(); ctx.arc(bird.x + 5, bird.y - 2, 1, 0, Math.PI * 2); ctx.fill();
+    }
+
+    function triggerFeedback(isCorrect) {
+        gameState = "HIT_FEEDBACK";
+        window.speechSynthesis.cancel();
+
+        const qData = fullQuizPool[currentQuizIndex];
+        const overlay = document.getElementById("feedback-overlay");
+        const title = document.getElementById("overlay-title");
+        const idolMsg = document.getElementById("idol-message");
+        const content = document.getElementById("feedback-content");
+
+        if (isCorrect) {
+            gameScore += 10;
+            document.getElementById("score-display").innerText = `SCORE: ${gameScore}`;
+            overlay.className = "overlay correct";
+            title.innerText = "🎉 正解！ ナイスキャッチ！";
+            idolMsg.innerText = `【${selectedIdol.name}】\n「${selectedIdol.correct}」`;
+        } else {
+            overlay.className = "overlay incorrect";
+            title.innerText = "😢 どんまい！おしい！";
+            idolMsg.innerText = `【${selectedIdol.name}】\n「${selectedIdol.incorrect}」`;
+        }
+
+        content.innerHTML = `
+            <strong>【覚える重要項目】</strong> ${qData.expression}<br>
+            <strong>【正しい英文】</strong> ${qData.sentence.replace("______", `<u><strong>${data = qData.a}</strong></u>`)}<br>
+            <strong>【日本語訳】</strong> ${qData.t}<br><br>
+            <strong>💡解説：</strong><br>${qData.ex}
+        `;
+
+        overlay.style.display = "block";
+        
+        // 自動でネイティブ発音を鳴らす
+        speakEnglish();
+    }
+
+    function reviveAndNext() {
+        document.getElementById("feedback-overlay").style.display = "none";
+        currentQuizIndex = (currentQuizIndex + 1) % fullQuizPool.length;
+        
+        // プレイヤー位置を戻してリスタート
+        bird.y = 100;
+        bird.velocity = 0;
+        gameState = "PLAYING";
+        setupQuestion();
+    }
+
+    function speakEnglish() {
+        const qData = fullQuizPool[currentQuizIndex];
+        window.speechSynthesis.cancel();
+        const rawSentence = qData.sentence.replace("______", qData.a);
+        const uttr = new SpeechSynthesisUtterance(rawSentence);
+        
+        const voices = window.speechSynthesis.getVoices();
+        let selectedVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Natural')));
+        if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith('en-US'));
+        
+        if (selectedVoice) uttr.voice = selectedVoice;
+        uttr.lang = "en-US";
+        uttr.rate = 0.85;
+        window.speechSynthesis.speak(uttr);
+    }
+
+    function goToPortal() {
+        window.speechSynthesis.cancel();
+        window.location.href = "../index.html";
+    }
+
+    // 初期起動
+    setupQuestion();
+    gameLoop();
+</script>
+
+</body>
+</html>
