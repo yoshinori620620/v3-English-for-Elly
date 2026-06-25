@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☆さっくんの！サクサク推し英語☆</title>
+    <style>
+        :root {
+            --primary-color: #FF69B4; /* さっくんのピンク！ */
+            --success-color: #2ECC71;
+            --error-color: #E74C3C;
+            --warning-color: #F39C12;
+            --background-color: #FFF0F5; /* 可愛い薄ピンク背景 */
+            --text-color: #333;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .game-container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(255, 105, 180, 0.2);
+            padding: 20px;
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+            position: relative;
+            border: 3px solid #FFB6C1;
+        }
+
+        .app-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #FFB6C1;
+        }
+
+        .back-top-btn {
+            background-color: #7F8C8D;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .back-top-btn:hover { background-color: #616A6B; }
+
+        .score-board {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+        }
+
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen.active { display: block; }
+
+        .welcome-text { text-align: center; color: #2C3E50; margin-top: 5px; margin-bottom: 20px; }
+        .welcome-text h2 { margin: 0 0 5px 0; font-size: 24px; color: #FF1493; font-weight: 900; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .welcome-text p { margin: 0; font-size: 13px; color: #7F8C8D; font-weight: bold; }
+
+        .menu-buttons { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+        .main-btn {
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .main-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary { background: linear-gradient(135deg, #FF69B4, #FF1493); }
+        .btn-warning { background: linear-gradient(135deg, #ff9f43, #f39c12); }
+
+        .list-section-title { font-size: 15px; font-weight: bold; color: #34495E; margin-bottom: 10px; }
+        
+        .problem-list { display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; padding-right: 5px; }
+        .problem-card {
+            background: #FFF5F7;
+            border: 1px solid #FFD1DC;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .problem-card:hover { border-color: var(--primary-color); background-color: #FFE4E1; }
+        
+        .card-left { display: flex; flex-direction: column; gap: 4px; }
+        .card-title { font-weight: bold; font-size: 14px; color: #2C3E50; }
+        .card-stats { font-size: 11px; color: #7F8C8D; }
+        .stat-badge { margin-right: 6px; padding: 2px 6px; border-radius: 4px; background: #FFF; border: 1px solid #FFE4E1; }
+        .stat-success { color: var(--success-color); font-weight: bold; }
+        .stat-error { color: var(--error-color); font-weight: bold; }
+
+        .status-badge { font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 12px; text-align: center; min-width: 60px; }
+        .status-unseen { background: #E2E8F0; color: #64748B; }
+        .status-correct { background: #E8F8F5; color: #117A65; }
+        .status-incorrect { background: #FDEDEC; color: #922B21; }
+
+        .japanese-meaning { background-color: #FFF5F7; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 16px; color: #2C3E50; margin-bottom: 15px; border-left: 5px solid var(--primary-color); }
+        .question-box { font-size: 19px; line-height: 1.6; margin-bottom: 25px; min-height: 50px; word-break: break-word; font-weight: bold; color: #2C3E50; }
+        .blank { color: #FF1493; font-weight: bold; text-decoration: underline; padding: 0 5px; }
+        .options-container { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn { background-color: white; border: 2px solid #FFD1DC; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: bold; text-align: left; cursor: pointer; transition: all 0.2s; color: #4A5568; outline: none; }
+        .option-btn:hover { border-color: var(--primary-color); background-color: #FFF5F7; }
+        
+        .idol-cheer-container { margin-top: 15px; display: none; animation: fadeIn 0.4s ease; }
+        .idol-avatar-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .idol-group-badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; background-color: #333; }
+        .idol-name { font-weight: 900; font-size: 16px; }
+        .idol-bubble { position: relative; background: #FFF; border-radius: 12px; padding: 12px 15px; font-size: 15px; font-weight: bold; line-height: 1.4; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid #333; }
+
+        .feedback-box { margin-top: 15px; padding: 15px; border-radius: 12px; display: none; background-color: #F8FAFC; border: 1px solid #E2E8F0; }
+        .feedback-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; color: #2C3E50; border-bottom: 1px solid #E2E8F0; padding-bottom: 4px; }
+        .feedback-detail { color: #2C3E50; font-size: 13px; line-height: 1.6; }
+
+        .action-btn { margin-top: 15px; width: 100%; background-color: #FF1493; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .action-btn:hover { background-color: #C71585; }
+
+        .review-list { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
+        .review-item { border-radius: 8px; border: 1px solid #FFD1DC; overflow: hidden; }
+        .review-header { padding: 10px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; justify-content: space-between; }
+        .review-item.correct .review-header { background-color: #E8F8F5; color: #117A65; }
+        .review-item.incorrect .review-header { background-color: #FDEDEC; color: #922B21; }
+        .review-body { padding: 12px; background-color: #FAFAFA; border-top: 1px solid #E2E8F0; font-size: 13px; display: none; line-height: 1.5; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="app-nav" id="app-nav" style="display: none;">
+        <button class="back-top-btn" onclick="goToTop()">🏠 Topに戻る</button>
+        <div class="score-board" id="score-display">SCORE: 0</div>
+    </div>
+
+    <!-- 1. TOP画面 -->
+    <div id="top-screen" class="screen active">
+        <div class="welcome-text">
+            <h2>☆さっくんの！<br>サクサク推し英語☆</h2>
+            <p>隙間時間に最強アイドルたちと英語をマスター！</p>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="main-btn btn-primary" onclick="startMode('random')">🎲 全問からランダム出題！</button>
+            <button class="main-btn btn-warning" id="review-mode-btn" onclick="startMode('review')">🔥 弱点克服（ミスした問題のみ）</button>
+        </div>
+
+        <div class="list-section-title">📊 学習ログ / 全100問リスト</div>
+        <div class="problem-list" id="problem-card-list"></div>
+    </div>
+
+    <!-- 2. クイズプレイ画面 -->
+    <div id="quiz-screen" class="screen">
+        <div class="japanese-meaning" id="quiz-theme"></div>
+        <div class="question-box" id="quiz-question"></div>
+        <div class="options-container" id="quiz-options"></div>
+
+        <!-- 👑 アイドル応援団演出エリア -->
+        <div class="idol-cheer-container" id="idol-cheer-box">
+            <div class="idol-avatar-bar">
+                <span class="idol-group-badge" id="idol-group"></span>
+                <span class="idol-name" id="idol-name"></span>
+            </div>
+            <div class="idol-bubble" id="idol-bubble-text"></div>
+        </div>
+
+        <div class="feedback-box" id="quiz-feedback">
+            <div class="feedback-title" id="quiz-feedback-title">💡 正解の解説・ニュアンス</div>
+            <div class="feedback-detail" id="quiz-feedback-detail"></div>
+        </div>
+        <button class="action-btn" id="quiz-next-btn" style="display:none;" onclick="handleNext()">次の問題へ 👉</button>
+    </div>
+
+    <!-- 3. 結果まとめ画面 -->
+    <div id="result-screen" class="screen">
+        <h3 style="text-align: center; color: #2C3E50; margin: 5px 0 15px 0;" id="result-title"></h3>
+        <div class="list-section-title">📝 今回解いた問題の振り返り</div>
+        <div class="review-list" id="result-review-list"></div>
+        <button class="action-btn" onclick="goToTop()">🏠 トップメニューへ戻る</button>
+    </div>
+</div>
+
+<script>
+    // 超大容量102パターンのアイドル応援団データベース
+    const idolSupportDatabase = [
+        { name: "佐久間大介", group: "Snow Man", color: "#FF69B4", correct: "最っ高！天才じゃん！イイね！その調子で次もいっちゃおう！🩷", incorrect: "ドンマイどんまい！大丈夫、さっくんが応援してるから次で絶対リベンジしよ！💪" },
+        { name: "佐久間大介", group: "Snow Man", color: "#FF69B4", correct: "うおー！大正解！君のひらめき、マジでバグるくらい素晴らしいわ！弾けてるぅ！弾丸イイね！🩷", incorrect: "おっとミスったか〜！でも落ち込まないで！さっくんと一緒に笑顔でもう一回トライだ！ピ〜ス！✌️" },
+        { name: "佐久間大介", group: "Snow Man", color: "#FF69B4", correct: "きたきたきたー！大正解！神がかってんじゃん！アニメの主人公級にカッコいいよ！完璧！🩷", incorrect: "大丈夫、大丈夫！失敗は成功への大事な伏線だからね！次の1問で華麗に回収しちゃおう！" },
+        { name: "佐久間大介", group: "Snow Man", color: "#FF69B4", correct: "ナイス正解！お前の英語力、本気でリスペクトだわ！よーし、このまま全問全勝突き進むぞー！🩷", incorrect: "どんまい！一歩引いて息整えよ！さっくんの特大パワー送るから、次の問題は絶対に仕留められる！" },
+        { name: "佐久間大介", group: "Snow Man", color: "#FF69B4", correct: "天才！最高！優勝！もう言葉が出ないくらい完璧だよ！お前の努力、さっくんが1番知ってる！🩷", incorrect: "おろ？おしいなぁ！でもね、悩んだ分だけお前は強くなってる！次、サクサクいっちゃお！" },
+        { name: "目黒蓮", group: "Snow Man", color: "#222222", correct: "正解。すごいじゃん、集中して頑張ってるのちゃんと見てたよ。🖤", incorrect: "おしい。焦らなくていいからね。次は絶対あたるよ、自分を信じて。👍" },
+        { name: "目黒蓮", group: "Snow Man", color: "#222222", correct: "よし、大正解。お前がコツコツやってきた結果だね。本当にかっこいいよ。🖤", incorrect: "ドンマイ。ここで諦めないお前が好きなんだわ。次、落ち着いて1問獲りにいこう。" },
+        { name: "目黒蓮", group: "Snow Man", color: "#222222", correct: "ナイス。バッチリ決まったね。その笑顔が見たかったんだ。次も応援してる。🖤", incorrect: "大丈夫、間違えたってことは次は間違えないってことだから。一歩ずつ、一緒に歩いていこう。" },
+        { name: "ラウール", group: "Snow Man", color: "#FFB6C1", correct: "Wow!! 大正解！すごーい、完璧すぎて僕もめちゃくちゃ嬉しい！🤍", incorrect: "大丈夫だよ！今のミスは次へのステップ！次、カッコよく決めちゃって！✨" },
+        { name: "ラウール", group: "Snow Man", color: "#FFB6C1", correct: "天才すぎる！スタイル抜群の正解だね！見てて本当にワクワクしちゃう！🤍", incorrect: "おしい！でもへこたれる暇はないよ！ランウェイを歩くみたいに堂々と次に進もう！" },
+        { name: "ラウール", group: "Snow Man", color: "#FFB6C1", correct: "素晴らしい！100点満点のひらめき！君の英語力、どんどん進化してるね！🤍", incorrect: "ドンマイ！気にする必要全くナシ！次はラウが特大のグッドラックを送るからね！" },
+        { name: "渡辺翔太", group: "Snow Man", color: "#3498db", correct: "やるじゃん。正直かなりカッコよかったわ、その調子！💙", incorrect: "あーおしい！端から見たらめっちゃ惜しかった。次、サクッと当てちゃおうぜ。👊" },
+        { name: "渡辺翔太", group: "Snow Man", color: "#3498db", correct: "お、正解！ふん、やると思ってたけどね。肌ツヤも良くなるくらい見事な正解！💙", incorrect: "おいおいどんまい！お前の実力はこんなもんじゃないだろ？次、本気出して見せてよ。" },
+        { name: "向井康二", group: "Snow Man", color: "#e67e22", correct: "大正解や！ゴイゴイスー！君の英語力、ほんまに輝いてるで！🧡", incorrect: "あちゃーおしい！でも涙拭いてな？次正解したらコージレーダーあげるから！どどんまい！" },
+        { name: "向井康二", group: "Snow Man", color: "#e67e22", correct: "素晴らしい！スーを差し上げます！カメラのシャッター切りたくなる最高の解答や！🧡", incorrect: "どんまいどんまい！俺のあったかい塩麹パワーあげるから、次でもりもり正解しよな！" },
+        { name: "阿部亮平", group: "Snow Man", color: "#2ecc71", correct: "素晴らしい！大正解だよ！完璧な知識だね、さすがです！💚", incorrect: "おしいなぁ。でもこの間違いでさらに知識が深まったよ。次はきっと大丈夫！" },
+        { name: "阿部亮平", group: "Snow Man", color: "#2ecc71", correct: "ナイス正解！論理的な思考がバッチリはまったね。勉強の成果が出てて素晴らしい！💚", incorrect: "ドンマイ。正解への解き方はもう分かったはずだよ。次は落ち着いて解いてみようね。" },
+        { name: "岩本照", group: "Snow Man", color: "#f1c40f", correct: "ナイス！完璧な一撃。その調子で脳をどんどんビルドアップしていこう！💛", incorrect: "ドンマイ。ここで諦めないのが一番強い。次の1問、きっちり仕留めよう。筋トレと一緒！" },
+        { name: "岩本照", group: "Snow Man", color: "#f1c40f", correct: "素晴らしい正解。限界を突破した感じがして最高にシブいね。その調子だ！💛", incorrect: "おしい。負荷がかかっている時ほど成長してる証拠。次、気合い入れ直してぶつかろう。" },
+        { name: "深澤辰哉", group: "Snow Man", color: "#9b59b6", correct: "よっしゃ正解！いや〜お前すごいわ！ふっかさん感動しちゃった！💜", incorrect: "あちゃーミスった？大丈夫大丈夫、最年長のふっかさんが全部受け止めてやるから次いこ！" },
+        { name: "深澤辰哉", group: "Snow Man", color: "#9b59b6", correct: "ナイス正解！お前やるじゃ〜ん！ご褒美にふっかさんのクレーンゲームの技見せちゃう？💜", incorrect: "どんまいどんまい！まあ、俺の三枚目パワーでここは水に流して、次で大逆転しよ！" },
+        { name: "宮舘涼太", group: "Snow Man", color: "#e74c3c", correct: "美しい正解だ。君の冴え渡るひらめき、まさにParty Timeだね。❤️", incorrect: "気にする必要はないよ。気品を保ちつつ、次のチャンスを華麗に掴み取ろう。" },
+        { name: "宮舘涼太", group: "Snow Man", color: "#e74c3c", correct: "私の目に狂いはなかった。薔薇のように華麗な正解、実に見事だよ。国王賞を贈ろう。❤️", incorrect: "おしい。だが、その悔しさこそが君をさらにエレガントにする。次の調べを奏でよう。" },
+
+        // --- King & Prince ---
+        { name: "永瀬廉", group: "King & Prince", color: "#2C3E50", correct: "正解！めっちゃすごいやん。お前の頑張り、ちゃんと届いてるで。🖤", incorrect: "あーおしい！まぁまぁ、おっけおっけ！次でしっかり取り返そうや、な？" },
+        { name: "永瀬廉", group: "King & Prince", color: "#2C3E50", correct: "ナイス大正解！やるやんけ。白米3杯はいけるくらい気持ちいい解答やわ！🖤", incorrect: "どんまい！全然問題ナシ！お前が次あてるところ、俺特等席でバッチリ見守ってるから。" },
+        { name: "高橋海人", group: "King & Prince", color: "#f1c40f", correct: "すごーい大正解！ひまわりみたいな満開の笑顔になっちゃう！イイね！💛", incorrect: "うわぁおしい！でも大丈夫、海ちゃんがずっと隣で応援してるから次がんばろ！" },
+        { name: "高橋海人", group: "King & Prince", color: "#f1c40f", correct: "やったあ！正解！センスの塊だね！ポップでカラフルなひらめき、最高！💛", incorrect: "どんまい！おっけおっけ、次は海ちゃんがダンスのステップを踏むみたいに軽快に当てちゃお！" },
+        { name: "平野紫耀", group: "King & Prince(OG)", color: "#e74c3c", correct: "よっしゃ正解！お前マジで天才！脳みそフル回転で超カッコいい！❤️", incorrect: "あちゃー！でもどんまいどんまい！俺なんていつも間違えるから大丈夫！次いこ！" },
+        { name: "平野紫耀", group: "King & Prince(OG)", color: "#e74c3c", correct: "すっげええ正解！お前神がかってんな！アクロバット決まった時くらいスカッとした！❤️", incorrect: "うわぁおしい！でも大丈夫、ぬれおかきでも食べてエネルギー補給して次ぶちかまそう！" },
+        { name: "岸優太", group: "King & Prince(OG)", color: "#9b59b6", correct: "うおおお正解！マジリスペクトっす！その英語力、ガチで本物！！💜", incorrect: "ドンマイっす！ここでへこたれなきゃ絶対次はっ…あたる！気合いで行きましょ！" },
+        { name: "岸優太", group: "King & Prince(OG)", color: "#9b59b6", correct: "大正解！きちゃいましたねお前さんの時代が！クワガタ捕まえた時くらい感動っす！💜", incorrect: "どんまいっす！僕の全力蕎麦すすりパワー送るんで、次でバシッと決めちゃってください！" },
+        { name: "神宮寺勇太", group: "King & Prince(OG)", color: "#3498db", correct: "正解だよ。スマートで本当に素敵だね。君のこと誇りに思うよ。💙", incorrect: "おしかったね。でも大丈夫、落ち込まないで。次は僕が全力でパワー送るからね。" },
+
+        // --- SixTONES ---
+        { name: "ジェシー", group: "SixTONES", color: "#e74c3c", correct: "正解！！ハハハ！素晴らしい！まさにAHAHAHAだね！Good job!❤️", incorrect: "オーマイガッ！ドンマイ！ズドン！！次は絶対いけるからスマイルで行こう！" },
+        { name: "ジェシー", group: "SixTONES", color: "#e74c3c", correct: "ナイス正解！ズドン！！君の英語、超イケてるよ！コングラッチュレーション！❤️", incorrect: "どんまいどんまい！逆境こそ楽しもうぜ！ハハハ！次、一発かまそう！ズドン！" },
+        { name: "京本大我", group: "SixTONES", color: "#FFD1DC", correct: "大正解！君のその解答、まるで美しいメロディのようだね。素敵だよ。🩷", incorrect: "おしいな…。でもね、ここからの巻き返しが一番美しいんだよ。次、期待してるね。" },
+        { name: "京本大我", group: "SixTONES", color: "#FFD1DC", correct: "完璧な解答だ、感動したよ。君の中に眠る可能性が解き放たれた瞬間だね。🩷", incorrect: "ドンマイ。世界が君を試しているのさ。次の一問で、華麗に真実の扉を開けよう。" },
+        { name: "松村北斗", group: "SixTONES", color: "#222222", correct: "正解。…やるね。君が努力してる成果がちゃんと形になってて素晴らしいよ。🖤", incorrect: "ミスは誰にでもある。大切なのは、それを引きずらずに次の一手に集中することだよ。" },
+        { name: "松村北斗", group: "SixTONES", color: "#222222", correct: "見事な正解。文学的で無駄のない素晴らしい選び方だ。誇っていいよ。🖤", incorrect: "おしい。読書で行間を読むように、もう一度問題と向き合えば、次は必ず解ける。" },
+        { name: "田中樹", group: "SixTONES", color: "#3498db", correct: "よっしゃ正解！お前マジでイケてんじゃん！最高、その調子でブチ上げようぜ！💙", incorrect: "あーミスったか！まぁそんな時もあるって。次ガツンと正解して、俺らを見返してくれよ。" },
+        { name: "田中樹", group: "SixTONES", color: "#3498db", correct: "ナイス正解！お前のライム、完全に決まったわ。このまま爆走していこうぜ！💙", incorrect: "どんまいどんまい！俺がバックアップしてやるから、ビビらず次の一問ラップ刻んでいこーぜ！" },
+        { name: "森本慎太郎", group: "SixTONES", color: "#2ecc71", correct: "うおっしゃ正解！パワー全開だね！最高に気持ちいい！！💚", incorrect: "どんまいどんまい！元気出していこうぜ！次はドカンと大正解ぶちかまそう！" },
+        { name: "高地優吾", group: "SixTONES", color: "#f1c40f", correct: "大正解！日々笑顔で頑張った成果が出たね！おめでとう！💛", incorrect: "おしいっ！でも下向かないで日々笑顔！次の一問、気楽に楽しんでいこう！" }
+    ];
+
+    // 大容量100問の英語表現クイズプール
+    const masterData = [
+        { id: 1, meaning: "大目に見る", expression: "Cut someone some slack", sentence: "He's new to the job, so ______ him some slack.", answer: "cut", options: ["cut", "take", "give"], translation: "彼は新人なんだから、大目に見（勘弁して）あげなよ。", explanation: "直訳は「誰かにロープのたるみを与える」。相手に少し余裕を持たせたり、厳しい追及を控えたりして「大目に見る」という意味で非常によく使われます。" },
+        { id: 2, meaning: "状況を見守る", expression: "Play it by ear", sentence: "We don't have a solid plan for tomorrow, so let's just ______ it by ear.", answer: "play", options: ["play", "do", "run"], translation: "明日の確実な計画はないから、その場の流れで決めよう。", explanation: "元々は「楽譜を見ずに即興で演奏する」が由来。事前に計画を立てず、状況に合わせて柔軟に対応する意味です。" },
+        { id: 3, meaning: "本音を吐く・ぶっちゃける", expression: "Spill the beans", sentence: "Don't ______ the beans about the surprise party!", answer: "spill", options: ["drop", "spill", "throw"], translation: "サプライズパーティーのことをバラさないでね！", explanation: "秘密をうっかり漏らす、あるいは「実はさ…」と隠していたことを白状する時に使います。" },
+        { id: 4, meaning: "勘違いする・お門違い", expression: "Bark up the wrong tree", sentence: "If you think I took your money, you're barking up the wrong ______.", answer: "tree", options: ["dog", "bush", "tree"], translation: "僕がお金を盗んだと思っているなら、それはお門違いだよ。", explanation: "猟犬が獲物のいない間違った木に向かって吠える様子が由来。「見当違いの努力や疑い」を指します。" },
+        { id: 5, meaning: "完全に同意する", expression: "See eye to eye", sentence: "My boss and I don't always see eye ______ eye on project details.", answer: "to", options: ["to", "with", "for"], translation: "上司と私は、プロジェクトの詳細についていつも意見が一致するわけではない。", explanation: "お互いの目と目が同じ高さにある、つまり「視点・意見がぴったり一致する」という意味です。" },
+        { id: 6, meaning: "話をはぐらかす", expression: "Beat around the bush", sentence: "Stop beating around the ______ and tell me what you really want.", answer: "bush", options: ["bush", "tree", "wall"], translation: "話をはぐらかすのはやめて、本当に欲しいものを言ってよ。", explanation: "本題に入らずに、遠回しな言い方をしたり核心を避けたりする様子を表します。" },
+        { id: 7, meaning: "もうお手上げ・諦める", expression: "Call it a day", sentence: "We’ve been working for ten hours, let's ______ it a day.", answer: "call", options: ["make", "call", "finish"], translation: "10時間も働いたんだから、今日はもう終わりにしよう。", explanation: "その日の仕事や活動を「今日はここまでにして終わりにしよう」と切り上げる時の定番です。" },
+        { id: 8, meaning: "冷ややな態度をとる", expression: "Give someone the cold shoulder", sentence: "Ever since our argument, she has been giving me the cold ______.", answer: "shoulder", options: ["hand", "shoulder", "eye"], translation: "口論して以来、彼女は僕に冷たい態度をとっている。", explanation: "人に対して意図的に冷たくしたり、無視したり、冷淡にあしらったりすることを指します。" },
+        { id: 9, meaning: "調子が悪くて・体調を崩して", expression: "Under the weather", sentence: "I'm feeling a bit ______ the weather today, so I'll stay home.", answer: "under", options: ["below", "under", "off"], translation: "今日は少し体調が優れないので、家にいます。", explanation: "「病気で寝込む」ほどではないけれど、なんとなく本調子ではないニュアンスです。" },
+        { id: 10, meaning: "とても簡単・朝飯前", expression: "A piece of cake", sentence: "The exam was a ______ of cake, I'm sure I passed.", answer: "piece", options: ["slice", "piece", "cup"], translation: "試験は朝飯前だったよ、絶対に合格してるね。", explanation: "ケーキを食べるのが簡単なように、何の苦労もなく簡単にできることを指します。" },
+        { id: 11, meaning: "本題に入る", expression: "Get down to business", sentence: "Now that everyone is here, let's get down to ______.", answer: "business", options: ["work", "business", "talk"], translation: "全員揃ったことだし、本題に入りましょう。", explanation: "雑談や前置きを終えて、本当に議論すべき核心的な話題に移ろうとする時の表現です。" },
+        { id: 12, meaning: "一石二鳥", expression: "Kill two birds with one stone", sentence: "By cycling to work, I can save money and get exercise, killing two ______ with one stone.", answer: "birds", options: ["birds", "flies", "rabbits"], translation: "自転車通勤をすれば、お金も節約できて運動もできる。一石二鳥だね。", explanation: "日本語の「一石二鳥」と全く同じで、1つの行動で2つの利益を同時に達成することを意味します。" },
+        { id: 13, meaning: "よくあること・珍しくない", expression: "A dime a dozen", sentence: "Apps like this are a ______ a dozen these days.", answer: "dime", options: ["cent", "dime", "dollar"], translation: "最近、こういうアプリはどこにでもあるよ。", explanation: "「10セントで12個買えるほどありふれている」という意味から、珍しくないものを指します。" },
+        { id: 14, meaning: "滅多にない・極めて稀", expression: "Once in a blue moon", sentence: "My brother lives abroad, so I only see him once in a ______ moon.", answer: "blue", options: ["red", "full", "blue"], translation: "兄は海外に住んでいるので、滅多に会えません。", explanation: "極めて稀にしか起こらない現象「ブルームーン」に由来し、頻度が非常に低いことを表します。" },
+        { id: 15, meaning: "状況が逆転する", expression: "The shoe is on the other foot", sentence: "He used to boss me around, but now that I'm his manager, the shoe is on the other ______.", answer: "foot", options: ["hand", "foot", "side"], translation: "彼は昔、私をこき使っていたが、今や私が彼のマネージャーなので立場が逆転した。", explanation: "立場や形勢がそれまでとは完全に逆になり、優位だった人が不利になったりする状況を表します。" },
+        { id: 16, meaning: "最初からやり直す", expression: "Back to square one", sentence: "Our budget proposal was rejected, so we are back to ______ one.", answer: "square", options: ["step", "square", "point"], translation: "予算案が却下されたので、私たちは振り出しに戻ってしまった。", explanation: "計画が失敗し、何の進展もない「最初のスタートライン」に戻らざるを得なくなった状況です。" },
+        { id: 17, meaning: "寝る・床に就く", expression: "Hit the sack", sentence: "I'm exhausted, I think it's time for me to ______ the sack.", answer: "hit", options: ["go", "hit", "take"], translation: "疲れ果てたよ、そろそろ寝る時間だな。", explanation: "麻袋を意味する「sack」が昔のマットレスだったことから、カジュアルに「寝る」と言う時の表現です。" },
+        { id: 18, meaning: "落ち着いて・冷静になって", expression: "Pull yourself together", sentence: "You need to pull yourself ______ before you give the presentation.", answer: "together", options: ["up", "out", "together"], translation: "プレゼンをする前に、気持ちを落ち着かせる必要があるよ。", explanation: "パニックになったり感情的に取り乱している人に対して、「しっかりしろ」と声をかける時の表現です。" },
+        { id: 19, meaning: "秘密を漏らす", expression: "Let the cat out of the bag", sentence: "We wanted to keep the wedding a secret, but my sister let the cat out of the ______.", answer: "bag", options: ["box", "bag", "cage"], translation: "結婚式は秘密にしたかったのに、妹がバラしてしまった。", explanation: "うっかり、あるいは隠しきれずに秘密を暴露してしまうことを意味します。" },
+        { id: 20, meaning: "とても高価・財布に大打撃", expression: "Cost an arm and a leg", sentence: "I’d love to buy that car, but it costs an arm and a ______.", answer: "leg", options: ["hand", "leg", "head"], translation: "あの車を買いたいけれど、べらぼうに高いんだよね。", explanation: "体の一部を差し出さなければならないほど、値段が「もの凄く高い」ことを表します。" },
+        { id: 21, meaning: "一からやり直す・白紙に戻す", expression: "Go back to the drawing board", sentence: "The marketing campaign didn't work, so we have to go back to the drawing ______.", answer: "board", options: ["board", "room", "table"], translation: "マーケティングキャンペーンがうまくいかなかったので、一からやり直さなければならない。", explanation: "計画が失敗に終わり、設計図を描く最初の企画段階からもう一度やり直す必要がある時に使われます。" },
+        { id: 22, meaning: "全く同じ状況にある", expression: "In the same boat", sentence: "We are all in the same ______, so let’s help each other out.", answer: "boat", options: ["ship", "boat", "car"], translation: "私たちはみんな同じ境遇にいるんだから、おお互いに助け合おう。", explanation: "「同じ船に乗っている」という意味から、同じ困難な境遇や運命を共有している状態を指します。" },
+        { id: 23, meaning: "直前で尻込みする", expression: "Get cold feet", sentence: "He was going to propose to her, but he got cold ______ at the last minute.", answer: "feet", options: ["hands", "feet", "heart"], translation: "彼は彼女にプロポーズするつもりだったが、直前になって尻込みしてしまった。", explanation: "大事な決断やイベントの直前になって、急に怖気づいたりためらったりすることを意味します。" },
+        { id: 24, meaning: "聞き耳を立てる", expression: "Be all ears", sentence: "Tell me what happened at the meeting, I'm all ______.", answer: "ears", options: ["eyes", "ears", "attention"], translation: "会議で何があったのか教えて、興味津々で聞くから。", explanation: "「体全体が耳になっている」イメージから、相手の話を前のめりで聞く姿勢を示す表現です。" },
+        { id: 25, meaning: "とても幸せ・有頂天", expression: "On cloud nine", sentence: "She has been on cloud ______ ever since she got promoted.", answer: "nine", options: ["seven", "nine", "ten"], translation: "彼女は昇進して以来、ずっと有頂天になっている。", explanation: "これ以上ないほど幸せで、気分が最高潮に達している状態を表します。気象用語が由来です。" },
+        { id: 26, meaning: "状況をコントロールしている", expression: "On top of things", sentence: "She is always on ______ of things, which makes her a great project manager.", answer: "top", options: ["top", "front", "head"], translation: "彼女はいつも状況を完璧にコントロールしているので、素晴らしいマネージャーだ。", explanation: "仕事や状況をしっかりと把握し、問題なくそつなくこなせている状態を表します。" },
+        { id: 27, meaning: "もうこれ以上耐えられない", expression: "The last straw", sentence: "When he forgot our anniversary, that was the last ______.", answer: "straw", options: ["straw", "drop", "card"], translation: "彼が記念日を忘れた時、それが最後の決定打（もう我慢の限界）だった。", explanation: "ロバの背中を折った最後の1本のわらに由来し、我慢の限界を超えさせる決定打を指します。" },
+        { id: 28, meaning: "見苦しい言い訳をする", expression: "Cry over spilled milk", sentence: "Yes, we made a mistake, but there's no use crying over spilled ______.", answer: "milk", options: ["water", "milk", "wine"], translation: "確かにミスはしたけれど、済んだことをクよくよ悔やんでも仕方がない。", explanation: "日本語の「覆水盆に返らず」に相当します。取り返しのつかないことを嘆く様子を指します。" },
+        { id: 29, meaning: "手っ取り早く済ませる・手抜きする", expression: "Cut corners", sentence: "The construction company cut ______, leading to safety issues.", answer: "corners", options: ["lines", "corners", "costs"], translation: "その建設会社は手抜き工事をしたため、安全上の問題を引き起こした。", explanation: "角を曲がらず斜めに突っ切るイメージから、手順を省いて「手抜きをする」意味になります。" },
+        { id: 30, meaning: "完全に騙す・からかう", expression: "Pull someone's leg", sentence: "Are you really moving to Antarctica? Or are you just pulling my ______?", answer: "leg", options: ["arm", "leg", "hair"], translation: "本当に南極に引っ越すの？それとも、ただ私をからかっているだけ？", explanation: "悪意のない冗談で事実とは違うことを信じ込ませ、「かつぐ」「からかう」という意味です。" },
+        { id: 31, meaning: "極めて健康である", expression: "Fit as a fiddle", sentence: "My grandfather is 80 years old, but he is still as fit as a ______.", answer: "fiddle", options: ["fiddle", "drum", "rock"], translation: "祖父は80歳ですが、今でもピンピンしていて非常に健康です。", explanation: "バイオリン(fiddle)が完璧に調律されている状態に由来し、体調万全な様子を表します。" },
+        { id: 32, meaning: "深く考えずに・直感で", expression: "Off the top of my head", sentence: "Off the top of my ______, I’d say the project will take about three weeks.", answer: "head", options: ["mind", "head", "tongue"], translation: "今パッと思いつく限りでは、プロジェクトには約3週間かかると思います。", explanation: "資料を調べたりせず、その場でパッと思い浮かんだ記憶頼みの情報を出すニュアンスです。" },
+        { id: 33, meaning: "一晩じっくり考える", expression: "Sleep on it", sentence: "That's a huge investment, so I need to ______ on it before deciding.", answer: "sleep", options: ["sleep", "think", "wait"], translation: "それは巨額の投資なので、決める前に一晩じっくり考える必要があります。", explanation: "焦って答えを出さず、「一晩寝て頭をすっきりさせてから考える」という時に使います。" },
+        { id: 34, meaning: "とても貴重・めったに出会えない", expression: "One in a million", sentence: "A loyal friend like her is one in a ______.", answer: "million", options: ["thousand", "million", "billion"], translation: "彼女のように忠実な友人は、めったに出会えない貴重な存在だ。", explanation: "100万人に1つの存在という意味から、並外れて素晴らしい人や希少な物を称える表現です。" },
+        { id: 35, meaning: "夜遅くまで猛勉強する", expression: "Burn the midnight oil", sentence: "I have a huge exam tomorrow, so I'll be burning the midnight ______ tonight.", answer: "oil", options: ["lamp", "oil", "candle"], translation: "明日大きな試験があるから、今夜は夜遅くまで猛勉強することになるよ。", explanation: "夜中にランプの油(oil)を燃やすという意味から、徹夜気味に励むことを表します。" },
+        { id: 36, meaning: "他人のプライベートに首を突っ込む", expression: "Nose around", sentence: "The journalists were ______ around for any signs of a scandal.", answer: "nosing", options: ["looking", "nosing", "running"], translation: "ジャーナリストたちは、スキャンダルの兆候がないかあちこち詮索していた。", explanation: "犬が鼻を近づけてクンクン嗅ぎ回る様子から、好奇心で詮索・覗き見する様子を指します。" },
+        { id: 37, meaning: "これ以上ないほど元気", expression: "Alive and kicking", sentence: "Despite the rumors of his retirement, the CEO is alive and ______.", answer: "kicking", options: ["kicking", "running", "working"], translation: "彼の引退の噂にもかかわらず、CEOは今も健在で元気に指揮を執っている。", explanation: "生きていて活発に動いている状態から、「ピンピンしている」「健在だ」と強調します。" },
+        { id: 38, meaning: "状況がまだ不確定である", expression: "Up in the air", sentence: "Our travel plans are still up in the ______ due to the flight delays.", answer: "air", options: ["sky", "air", "cloud"], translation: "飛行機の遅延のせいで、私たちの旅行計画はまだ不確定のままだ。", explanation: "宙に浮いている状態を指し、計画や決定が流動的で不透明な状況にあることを意味します。" },
+        { id: 39, meaning: "現実を直視する・受け入れる", expression: "Face the music", sentence: "You broke the window, so you have to ______ the music and tell your parents.", answer: "face", options: ["face", "hear", "listen"], translation: "君が窓を割ったんだから、現実から逃げずに親に言いなさい。", explanation: "失敗の結果として生じる不快な現実や批判を、逃げずに正面から受け止める表現です。" },
+        { id: 40, meaning: "話の腰を折る・先走る", expression: "Jump the gun", sentence: "Don't jump the ______ and announce the product before it's fully tested.", answer: "gun", options: ["gun", "line", "start"], translation: "完全にテストされる前に製品を発表して、先走るようなことはしないでください。", explanation: "陸上競技でピストルが鳴る前にフライングすることから、時期尚早に行動する意味です。" },
+        { id: 41, meaning: "度肝を抜く", expression: "Blow someone's mind", sentence: "The special effects in that movie completely ______ my mind.", answer: "blew", options: ["blew", "shocked", "broke"], translation: "あの映画の特撮は、完全に私の度肝を抜いた。", explanation: "信じられないほど素晴らしく、強い衝撃を受けて「感動・圧倒させる」という意味です。" },
+        { id: 42, meaning: "何か怪しい・裏がある", expression: "Smell a rat", sentence: "When he offered me a free luxury trip, I started to ______ a rat.", answer: "smell", options: ["see", "smell", "catch"], translation: "彼が無料の豪華旅行を提案してきたとき、何か怪しいと疑い始めた。", explanation: "おかしな点や裏切りの気配を直感的に察知し、「怪しいぞ」と感じる時のフレーズです。" },
+        { id: 43, meaning: "無駄になる・水の泡になる", expression: "Go down the drain", sentence: "All our hard work went down the ______ when the project was canceled.", answer: "drain", options: ["river", "drain", "floor"], translation: "プロジェクトが中止になり、私たちのこれまでの努力はすべて水の泡になった。", explanation: "排水溝(drain)に流れて消えるイメージから、費やした時間やお金が無駄になることを表します。" },
+        { id: 44, meaning: "簡単に稼げる・ボロ儲け", expression: "Easy money", sentence: "He thinks investing in crypto is ______ money, but it’s very risky.", answer: "easy", options: ["fast", "easy", "good"], translation: "彼は暗号資産への投資をボロ儲けだと思っているが、非常にリスクが高い。", explanation: "大した努力をすることなく、手っ取り早く手に入る利益のことを指します。" },
+        { id: 45, meaning: "一瞬で・あっという間に", expression: "In the blink of an eye", sentence: "The motorcycle sped past and disappeared in the ______ of an eye.", answer: "blink", options: ["wink", "blink", "open"], translation: "バイクはスピードを上げて通り過ぎ、あっという間に見えなくなった。", explanation: "まばたき(blink)をする一瞬の間に、という比喩から非常に短い時間を表します。" },
+        { id: 46, meaning: "自分の行動に責任を持つ・自業自得", expression: "As you sow, so shall you reap", sentence: "He cheated on his exams and got suspended; as you ______, so shall you reap.", answer: "sow", options: ["sow", "see", "do"], translation: "彼はテストでカンニングをして停学になった。自業自得だよ。", explanation: "「自分が蒔いた種は自分で刈り取らねばならない」という聖書由来の因果応報表現です。" },
+        { id: 47, meaning: "完全に秘密にする", expression: "Keep it under wraps", sentence: "We need to keep the new design under ______ until the official launch.", answer: "wraps", options: ["wraps", "boxes", "covers"], translation: "公式発表までは、新しいデザインを完全に秘密にしておく必要があります。", explanation: "情報を公にせず「包み(wraps)の下に隠しておく」、つまり極秘にするという意味です。" },
+        { id: 48, meaning: "アイデアをブレストする", expression: "Brainstorm", sentence: "Let's get together tomorrow to ______ some ideas for the campaign.", answer: "brainstorm", options: ["think", "talk", "brainstorm"], translation: "キャンペーンのアイデアを出すために、明日集まってブレストしましょう。", explanation: "複数人で自由にアイデアを出し合い、クリティブな発想を生み出す行為を指します。" },
+        { id: 49, meaning: "調子に乗る・うぬぼれる", expression: "Get a big head", sentence: "Don't let that small success give you a big ______.", answer: "head", options: ["head", "mind", "mouth"], translation: "その程度の小さな成功で、調子に乗るんじゃないよ。", explanation: "賞賛などによって自分が偉くなったと勘違いし、傲慢・天狗になる様子を指します。" },
+        { id: 50, meaning: "持ちこたえる・踏ん張る", expression: "Hang in there", sentence: "I know the exam study is tough, but ______ in there; it’s almost over.", answer: "hang", options: ["stay", "hang", "stand"], translation: "試験勉強がつらいのはわかるけど、あと少しだから踏ん張って！", explanation: "つらい状況や諦めそうな局面に立たされている人を「あきらめずに頑張れ」と励ますフレーズです。" },
+        { id: 51, meaning: "話が噛み合わない・すれ違う", expression: "Be on a different page", sentence: "I think we are on a ______ page regarding the budget for this project.", answer: "different", options: ["wrong", "different", "other"], translation: "このプロジェクトの予算に関して、私たちの認識はズレていると思います。", explanation: "お互いの理解や共通認識が一致していない状態を指します。一致は「on the same page」です。" },
+        { id: 52, meaning: "足を引っ張る・前進を阻む", expression: "Hold someone back", sentence: "Don't let your fear of failure ______ you back from trying new things.", answer: "hold", options: ["keep", "hold", "take"], translation: "失敗への恐怖のせいで、新しいことに挑戦するのを躊躇させてはいけない。", explanation: "誰かの進歩や成長を妨げ、足枷（足枷）となって前進を阻むという意味です。" },
+        { id: 53, meaning: "体調がだるい・不機嫌な", expression: "Out of sorts", sentence: "I woke up feeling a bit out of ______ this morning, so I skipped breakfast.", answer: "sorts", options: ["sorts", "kinds", "orders"], translation: "今朝はなんとなく体調が優れなかったので、朝食を抜いた。", explanation: "大病ではないものの、体のだるさや気分の優れなさ、イライラがある状態です。" },
+        { id: 54, meaning: "非常に激しい雨が降る", expression: "Rain cats and dogs", sentence: "Take an umbrella with you; it's raining ______ and dogs outside.", answer: "cats", options: ["birds", "cats", "frogs"], translation: "傘を持っていきなさい。外は土砂降りだよ。", explanation: "「犬と猫が降ってくる」という非常に有名な比喩で、大雨・土砂降りを表します。" },
+        { id: 55, meaning: "話を鵜呑みにしない・話半分に聞く", expression: "Take it with a grain of salt", sentence: "He exaggerates a lot, so you should take his stories with a ______ of salt.", answer: "grain", options: ["grain", "piece", "bit"], translation: "彼は大げさに話す癖があるから、彼の話は半分に聞いておいたほうがいいよ。", explanation: "すべてを真に受けるのではなく、少し疑ってかかったり割り引いて聞くという意味です。" },
+        { id: 56, meaning: "要点を言えば・一言で言うと", expression: "In a nutshell", sentence: "In a ______, the company is going bankrupt due to poor management.", answer: "nutshell", options: ["nutshell", "box", "word"], translation: "一言で言えば、その会社は経営不振で倒産するということだ。", explanation: "「木の実の殻の中に収まるくらい小さくまとめる」という意味から、話を要約する時に使います。" },
+        { id: 57, meaning: "きっぱり止める・完全に断つ", expression: "Cold turkey", sentence: "He quit smoking ______ turkey and hasn't touched a cigarette in a year.", answer: "cold", options: ["fast", "cold", "hard"], translation: "彼はタバコをきっぱりと辞め、1年間1本も触れていない。", explanation: "悪い習慣などを、徐々に減らすのではなく「ある日突然、完全に断ち切る」ことです。" },
+        { id: 58, meaning: "考えるまでもない当然の選択", expression: "No-brainer", sentence: "Accepting that high-paying job offer was a complete ______.", answer: "no-brainer", options: ["easy-one", "no-brainer", "good-deal"], translation: "あの高給の仕事のオファーを受けるのは、考えるまでもない当然の選択だった。", explanation: "脳みそを使う必要すら届かないほど、誰が見ても明らかな簡単な決定を指します。" },
+        { id: 59, meaning: "全く見当がつかない", expression: "Have no clue", sentence: "I have no ______ where I left my car keys.", answer: "clue", options: ["clue", "idea", "sign"], translation: "車の鍵をどこに置き忘れたのか、さっぱり見当がつかない。", explanation: "「手がかり(clue)すら持っていない」という意味で、さっぱり知らない時に使います。" },
+        { id: 60, meaning: "とても順調に進む", expression: "Go like clockwork", sentence: "The product launch went like ______ thanks to the team's preparation.", answer: "clockwork", options: ["train", "clockwork", "stream"], translation: "チームの準備のおかげで、製品の発売は非常に順調に進んだ。", explanation: "時計の歯車が正確に動く様子から、トラブルなく非常にスムーズに進行する意味です。" },
+        { id: 61, meaning: "腹を割って話す", expression: "Have a heart-to-heart", sentence: "I need to have a ______-to-heart with my son about his future.", answer: "heart", options: ["mind", "heart", "face"], translation: "息子の将来について、彼と腹を割って話し合う必要がある。", explanation: "隠し事をせず心を開いて、感情や本音を真剣に話し合う親密な対話です。" },
+        { id: 62, meaning: "核心を突く・図星である", expression: "Hit the nail on the head", sentence: "Your analysis of the sales drop hit the ______ on the head.", answer: "nail", options: ["nail", "hammer", "pin"], translation: "売上減少に関する君の分析は、まさに核心を突いているよ。", explanation: "釘の頭を正確に叩くという意味から、指摘が原因を完璧に捉えている時に称賛する言葉です。" },
+        { id: 63, meaning: "多すぎる仕事を抱え込む", expression: "Bite off more than you can chew", sentence: "By taking on three projects at once, he bit ______ more than he could chew.", answer: "off", options: ["off", "out", "up"], translation: "一度に3つのプロジェクトを引き受けたことで、彼はキャパオーバーになってしまった。", explanation: "口に入りきらない量を噛みちぎるイメージから、キャパを超えた責任を引き受ける様子を指します。" },
+        { id: 64, meaning: "神経を逆撫でする・イラつかせる", expression: "Rub someone the wrong way", sentence: "His arrogant attitude always ______ me the wrong way.", answer: "rubs", options: ["takes", "rubs", "makes"], translation: "彼の傲慢な態度は、いつも私の神経を逆撫でする。", explanation: "動物の毛並みに逆らって撫でるイメージから、なんとなく相手を気に障らせるニュアンスです。" },
+        { id: 65, meaning: "大きなお世話だ・首を突っ込むな", expression: "Mind your own business", sentence: "Stop asking about my salary and ______ your own business!", answer: "mind", options: ["keep", "mind", "take"], translation: "私の給料について聞くのはやめて、余計なお世話だよ！", explanation: "他人の私生活などに口出しされた時、「あなたには関係ない」と突き放す強い表現です。" },
+        { id: 66, meaning: "冷静さを保つ・取り乱さない", expression: "Keep your cool", sentence: "Even when the customer started yelling, the cashier ______ her cool.", answer: "kept", options: ["held", "kept", "saved"], translation: "客が怒鳴り始めたときでも、レジ係は冷静さを保っていた。", explanation: "プレッシャーのかかる状況下で感情をコントロールし、大人の対応をすることを意味します。" },
+        { id: 67, meaning: "がっかりさせる・期待を裏切る", expression: "Let someone down", sentence: "I promised to help her move, and I don't want to ______ her down.", answer: "let", options: ["let", "put", "take"], translation: "彼女の引っ越しを手伝うと約束したから、彼女をがっかりさせたくないんだ。", explanation: "寄せていた期待や信頼に応えられず、相手を落胆させるという意味の頻出表現です。" },
+        { id: 68, meaning: "一から出直す・リセットする", expression: "Wipe the slate clean", sentence: "Moving to a new city allowed him to ______ the slate clean and start over.", answer: "wipe", options: ["wash", "wipe", "clear"], translation: "新しい街に引っ越したことで、彼は過去をリセットして再出発することができた。", explanation: "石版に書かれた文字を消す意味から、過去の過ちやしがらみを帳消しにする状況を指します。" },
+        { id: 69, meaning: "うっかり忘れる", expression: "Slip my mind", sentence: "I'm so sorry I didn't call you; it completely ______ my mind.", answer: "slipped", options: ["dropped", "slipped", "lost"], translation: "電話しなくて本当にごめん、完全に頭から抜け落ちていたよ。", explanation: "約束や予定が頭の中から「するりと滑り落ちる」ように忘れてしまう様子を表します。" },
+        { id: 70, meaning: "計画を一時保留にする", expression: "Put it on ice", sentence: "Let's put this marketing project on ______ until we secure more budget.", answer: "ice", options: ["ice", "hold", "back"], translation: "もっと予算を確保できるまで、このマーケティングプロジェクトは一時保留にしましょう。", explanation: "完全に中止するのではなく、状況が整うまで「一時的に冷凍保存（保留）する」意味です。" },
+        { id: 71, meaning: "困難に正面から立ち向かう", expression: "Take the bull by the horns", sentence: "Instead of avoiding the conflict, she decided to ______ the bull by the horns.", answer: "take", options: ["catch", "take", "pull"], translation: "対立を避ける代わりに、彼女は意を決して正面から上司と話し合うことにした。", explanation: "雄牛の角を掴んで抑え込む様子から、躊躇せず果敢に問題に立ち向かうことを表します。" },
+        { id: 72, meaning: "何かが怪しい・胡散臭い", expression: "Fishy", sentence: "His excuse for missing the meeting sounds a bit ______ to me.", answer: "fishy", options: ["fishy", "smelly", "dark"], translation: "彼が会議を欠席した言い訳は、私にはどうも少し怪しく聞こえる。", explanation: "魚のような生臭さが漂うことから、不自然で裏に不正がある気がする時に使います。" },
+        { id: 73, meaning: "流行に便乗する・乗っかる", expression: "Jump on the bandwagon", sentence: "Many tech companies are jumping on the AI ______ these days.", answer: "bandwagon", options: ["train", "car", "bandwagon"], translation: "最近、多くのIT企業がAIのトレンドに便乗している。", explanation: "パレードの楽隊車に飛び乗る意味から、みんながやっているから自分も始める様子を指します。" },
+        { id: 74, meaning: "腹をくくって耐える", expression: "Bite the bullet", sentence: "I hate going to the dentist, but I just need to ______ the bullet and go.", answer: "bite", options: ["bite", "chew", "face"], translation: "歯医者に行くのは大嫌いだけど、腹をくくって行くしかないな。", explanation: "避けて通れない辛いことに対して、意を決して立ち向かう苦渋の決断のニュアンスです。" },
+        { id: 75, meaning: "かいつまんで言うと・要するに", expression: "Long story short", sentence: "______ story short, we missed our flight and had to stay at the airport.", answer: "Long", options: ["Short", "Long", "Brief"], translation: "かいつまんで言うと、飛行機に乗り遅れて空港に泊まる羽目になったんだ。", explanation: "「長い話を短くまとめると」という意味で、前置きを省いて結論を急ぐ時の大定番です。" },
+        { id: 76, meaning: "静観する・どっちつかずの態度", expression: "Sit on the fence", sentence: "You can't sit on the ______ forever; you have to choose a side.", answer: "fence", options: ["wall", "fence", "chair"], translation: "いつまでもどっちつかずの態度でいるわけにはいかない。どちらかを選ばないと。", explanation: "フェンスの上に座りどちら側にも降りない様子から、中立や日和見の態度を指します。" },
+        { id: 77, meaning: "完全な的外れである", expression: "Wide of the mark", sentence: "His prediction about the election result was ______ of the mark.", answer: "wide", options: ["far", "wide", "out"], translation: "選挙結果に関する彼の予測は、完全に的外れだった。", explanation: "矢が標的から大きく外れている意味から、推測や分析が見当違いであることを表します。" },
+        { id: 78, meaning: "不運な状況でベストを尽くす", expression: "Make the best of a bad situation", sentence: "Our outdoor wedding was ruined by rain, but we ______ the best of a bad situation.", answer: "made", options: ["did", "made", "took"], translation: "雨で屋外の結婚式は台無しになったが、私たちは前向きにできる限りのことをした。", explanation: "悪条件の中でもクよくよせず、前向きになんとかやりくりするポジティブな姿勢です。" },
+        { id: 79, meaning: "とても簡単・楽勝", expression: "A walk in the park", sentence: "Compared to the last exam, this one was a ______ in the park.", answer: "walk", options: ["run", "walk", "play"], translation: "前回の試験に比べたら、今回のテストは楽勝だったよ。", explanation: "公園の散歩のように、何のプレッシャーもなく非常に簡単にこなせるタスクを指します。" },
+        { id: 80, meaning: "絶対に秘密を漏らさない", expression: "My lips are sealed", sentence: "Don't worry, you can trust me; my lips are ______.", answer: "sealed", options: ["closed", "locked", "sealed"], translation: "心配しないで、僕を信頼していいよ。口は絶対に割らないから。", explanation: "「唇が密閉されている」という意味から、秘密を守ることを強く約束する表現です。" },
+        { id: 81, meaning: "ポーカーフェイスを保つ・真顔でいる", expression: "Keep a straight face", sentence: "It was hard to keep a ______ face when he made that ridiculous mistake.", answer: "straight", options: ["straight", "cool", "flat"], translation: "彼があんな馬鹿げたミスをしたとき、笑いをこらえる（真顔を保つ）のが大変だった。", explanation: "おかしなことがあっても笑いださず、意図的にすました顔をすることを意味します。" },
+        { id: 82, meaning: "すぐにコツを掴む・適応する", expression: "Take to it like a duck to water", sentence: "She had never programmed before, but she took to it like a duck to ______.", answer: "water", options: ["river", "water", "lake"], translation: "彼女はプログラミングの経験がなかったが、すぐにコツを掴んで上達した。", explanation: "アヒルが水に慣れるように自然に馴染み、何の苦労もなく上達していく様子を指します。" },
+        { id: 83, meaning: "言葉通り真に受ける", expression: "Take someone at their word", sentence: "He said he would pay me back tomorrow, and I took him at his ______.", answer: "word", options: ["word", "talk", "promise"], translation: "彼は明日お金を返してくれると言ったので、私は彼の言葉を真に受けた。", explanation: "相手が言った言葉に裏や嘘がないと信じて、そのまま受け取るという意味です。" },
+        { id: 84, meaning: "痛いところを突く", expression: "Touch a sore spot", sentence: "When I asked about his failed business, I clearly touched a ______ spot.", answer: "sore", options: ["bad", "pain", "sore"], translation: "彼の失敗したビジネスについて尋ねたとき、私は明らかに彼の痛いところを突いてしまった。", explanation: "触れられたくない話題や失敗に言及し、相手の神経を逆撫ですることを意味します。" },
+        { id: 85, meaning: "非常に退屈である", expression: "Like watching paint dry", sentence: "That history lecture was like watching ______ dry.", answer: "paint", options: ["paint", "water", "grass"], translation: "あの歴史の講義は、信じられないほど退屈だったよ。", explanation: "塗ったペンキが乾くのを眺めているように、耐えられないほど退屈な様子をユーモラスに言います。" },
+        { id: 86, meaning: "頭に入れておく・忘れない", expression: "Keep it in mind", sentence: "Please keep in ______ that the office will be closed this Friday.", answer: "mind", options: ["mind", "head", "brain"], translation: "今週金曜日はオフィスが閉まっていることを、頭に入れておいてください。", explanation: "将来の行動のために、特定のアドバイスを忘れないよう肝に銘じる意味です。" },
+        { id: 87, meaning: "話を大げさに言う・盛る", expression: "Stretch the truth", sentence: "He tends to ______ the truth when he talks about his past achievements.", answer: "stretch", options: ["make", "stretch", "big"], translation: "彼は過去の実績について話すとき、話を盛る傾向がある。", explanation: "真っ赤な嘘をつくわけではないけれど、事実を引き伸ばして誇張する表現です。" },
+        { id: 88, meaning: "見て見ぬふりをする・黙認する", expression: "Turn a blind eye", sentence: "The teacher turned a ______ eye to the students whispering during the test.", answer: "blind", options: ["blind", "closed", "dark"], translation: "先生は、テスト中に生徒たちがささやき合っているのを見て見ぬふりをした。", explanation: "不都合な事実を知っていながら、あえて気付かないふりをしてやり過ごすことです。" },
+        { id: 89, meaning: "予定通り・順調に進んでいる", expression: "On track", sentence: "We are on ______ to complete the project by the end of this month.", answer: "track", options: ["track", "line", "road"], translation: "私たちは今月末までにプロジェクトを完了できるよう、予定通りに進んでいます。", explanation: "列車が線路(track)の上を走るように、目標に向けた進捗が遅れていない状態です。" },
+        { id: 90, meaning: "またの機会にする・リスケする", expression: "Take a rain check", sentence: "I'd love to go out for dinner, but I have to work late; can I take a ______ check?", answer: "rain", options: ["rain", "free", "time"], translation: "ディナーに行きたいのは山々だけど、残業があるんだ。またの機会にしてもいい？", explanation: "雨天中止の再試合チケットが由来。誘いを角を立てずに断る超定番のフレーズです。" },
+        { id: 91, meaning: "パニックになる・理性を失う", expression: "Lose your head", sentence: "When the fire alarm went off, she ______ her head and started running.", answer: "lost", options: ["lost", "dropped", "missed"], translation: "火災報知器が鳴ったとき、彼女はパニックになり、走り回った。", explanation: "危機に直面した時に冷静な思考ができなくなり、取り乱したりカッとなる意味です。" },
+        { id: 92, meaning: "目標・本質を見失わない", expression: "Keep your eye on the prize", sentence: "Studying for the bar exam is brutal, but you need to keep your eye on the ______.", answer: "prize", options: ["goal", "prize", "win"], translation: "司法試験の勉強は過酷だが、合格という最終目標を見失わないようにしなければならない。", explanation: "途中でどんな困難があっても、最終的なゴール(prize)から目を離さないことを促します。" },
+        { id: 93, meaning: "優しく接する・手加減する", expression: "Go easy on someone", sentence: "Please go ______ on him; it's his first day on the job.", answer: "easy", options: ["easy", "soft", "good"], translation: "仕事の初日なんだから、彼をあまり厳しく叱らないで（大目に見て）あげね。", explanation: "過ちを犯した人や不慣れな人をあまり厳しく批判せず、大目に見る時に使います。" },
+        { id: 94, meaning: "突飛すぎる・現実離れしている", expression: "Far-fetched", sentence: "His excuse about an alien abduction was a bit far-______.", answer: "fetched", options: ["fetched", "away", "out"], translation: "宇宙人に誘拐されたという彼の言い訳は、いくらなんでも突飛すぎた。", explanation: "遠くから持ってきたという意味から、非現実的で信じがたいストーリーを指します。" },
+        { id: 95, meaning: "急速に悪化する・破綻する", expression: "Go south", sentence: "The negotiations were going well, but suddenly everything went ______.", answer: "south", options: ["south", "down", "bad"], translation: "交渉は順調に進んでいたが、突然すべてが悪化（決裂）した。", explanation: "地図の下方向（南）に由来し、状況や人間関係が悪い方向へ向かう俗語です。" },
+        { id: 96, meaning: "興をそぐ・水を差す", expression: "Rain on someone's parade", sentence: "I hate to rain on your ______, but the outdoor event has been canceled.", answer: "parade", options: ["party", "parade", "day"], translation: "君の楽しみにしているところに水を差したくはないが、屋外イベントは中止になったよ。", explanation: "誰かのパレードに雨を降らせるという意味から、ハッピーな雰囲気を台無しにする表現です。" },
+        { id: 97, meaning: "型にはまらない斬新な発想をする", expression: "Think outside the box", sentence: "To solve this unique problem, we need to think ______ the box.", answer: "outside", options: ["out", "outside", "over"], translation: "このユニークな問題を解決するためには、私たちは既成概念にとらわれずに考える必要がある。", explanation: "従来の常識や固定観念の「箱」にとらわれず、独自の視点でクリエイティブに考えることです。" },
+        { id: 98, meaning: "努力が実を結ぶ・報われる", expression: "Pay off", sentence: "All those hours of studying finally paid ______ when she passed the exam.", answer: "off", options: ["off", "out", "back"], translation: "試験に合格した時、何時間もの猛勉強がようやく報われた。", explanation: "長い間続けてきた努力やリスクが、最終的に良い結果をもたらすことを意味します。" },
+        { id: 99, meaning: "言葉が喉まで出かかっている", expression: "On the tip of my tongue", sentence: "What was the name of that restaurant? It’s on the tip of my ______.", answer: "tongue", options: ["mouth", "tongue", "head"], translation: "あのレストランの名前何だっけ？あそこまで出かかってるんだけど。", explanation: "思い出せそうであと一歩のところで思い出せない、もどかしい状態を表します。" },
+        { id: 100, meaning: "流れに身を任せる", expression: "Go with the flow", sentence: "I don't have a specific plan for the weekend; I'll just go with the ______.", answer: "flow", options: ["wind", "flow", "wave"], translation: "週末の具体的な予定はないんだ。ただその場の流れに身を任せるよ。", explanation: "強いこだわりを持たず、周囲の雰囲気やその場の展開に柔軟に対応するニュアンスです。" }
+    ];
+
+    let currentQueue = [];
+    let queueIndex = 0;
+    let currentScore = 0;
+    let isAnswered = false;
+    let currentSessionResults = [];
+    let currentIdol = null;
+
+    window.onload = function() {
+        renderTopScreen();
+    };
+
+    function renderTopScreen() {
+        document.getElementById('app-nav').style.display = 'none';
+        showScreen('top-screen');
+        
+        const cardListContainer = document.getElementById('problem-card-list');
+        cardListContainer.innerHTML = '';
+
+        let hasIncorrect = false;
+
+        masterData.forEach(item => {
+            if (item.lastStatus === "不正解") hasIncorrect = true;
+
+            let badgeClass = "status-unseen";
+            if (item.lastStatus === "正解") badgeClass = "status-correct";
+            if (item.lastStatus === "不正解") badgeClass = "status-incorrect";
+
+            const card = document.createElement('div');
+            card.className = 'problem-card';
+            card.onclick = () => startSingleQuestion(item.id);
+            card.innerHTML = `
+                <div class="card-left">
+                    <div class="card-title">第${item.id}問: ${item.meaning}</div>
+                    <div class="card-stats">
+                        <span class="stat-badge">回答: ${item.timesPlayed || 0}回</span>
+                        <span class="stat-badge stat-success">〇: ${item.correctCount || 0}</span>
+                        <span class="stat-badge stat-error">×: ${item.incorrectCount || 0}</span>
+                    </div>
+                </div>
+                <div class="status-badge ${badgeClass}">${item.lastStatus || "未挑戦"}</div>
+            `;
+            cardListContainer.appendChild(card);
+        });
+
+        const reviewBtn = document.getElementById('review-mode-btn');
+        if (hasIncorrect) {
+            reviewBtn.disabled = false;
+            reviewBtn.style.opacity = "1";
+            reviewBtn.innerText = "🔥 弱点克服（ミスした問題のみ）";
+        } else {
+            reviewBtn.disabled = true;
+            reviewBtn.style.opacity = "0.4";
+            reviewBtn.innerText = "🔒 弱点克服（現在ミスした問題はありません）";
+        }
+    }
+
+    function startMode(mode) {
+        currentSessionResults = [];
+        currentScore = 0;
+        queueIndex = 0;
+        document.getElementById('score-display').innerText = `SCORE: ${currentScore}`;
+        document.getElementById('app-nav').style.display = 'flex';
+
+        if (mode === 'random') {
+            currentQueue = masterData.map(item => item.id);
+            currentQueue.sort(() => Math.random() - 0.5);
+        } else if (mode === 'review') {
+            currentQueue = masterData.filter(item => item.lastStatus === "不正解").map(item => item.id);
+            currentQueue.sort(() => Math.random() - 0.5);
+        }
+
+        if (currentQueue.length > 0) {
+            pickRandomIdol();
+            showScreen('quiz-screen');
+            loadQuizQuestion();
+        }
+    }
+
+    function startSingleQuestion(id) {
+        currentSessionResults = [];
+        currentScore = 0;
+        queueIndex = 0;
+        document.getElementById('score-display').innerText = `SCORE: ${currentScore}`;
+        document.getElementById('app-nav').style.display = 'flex';
+        
+        currentQueue = [id];
+        pickRandomIdol();
+        showScreen('quiz-screen');
+        loadQuizQuestion();
+    }
+
+    function pickRandomIdol() {
+        const randomIndex = Math.floor(Math.random() * idolSupportDatabase.length);
+        currentIdol = idolSupportDatabase[randomIndex];
+    }
+
+    function loadQuizQuestion() {
+        isAnswered = false;
+        const activeId = currentQueue[queueIndex];
+        const questionData = masterData.find(item => item.id === activeId);
+
+        document.getElementById('quiz-theme').innerText = `第${questionData.id}問 のテーマ：「${questionData.meaning}」`;
+        document.getElementById('quiz-question').innerHTML = questionData.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
+        
+        const optionsBox = document.getElementById('quiz-options');
+        optionsBox.innerHTML = '';
+
+        questionData.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkQuizAnswer(opt, btn, questionData);
+            optionsBox.appendChild(btn);
+        });
+
+        document.getElementById('idol-cheer-box').style.display = 'none';
+        document.getElementById('quiz-feedback').style.display = 'none';
+        document.getElementById('quiz-next-btn').style.display = 'none';
+    }
+
+    function checkQuizAnswer(selected, buttonElement, data) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const optionBtns = document.querySelectorAll('.option-btn');
+        optionBtns.forEach(btn => btn.style.cursor = 'default');
+
+        const feedbackBox = document.getElementById('quiz-feedback');
+        const feedbackDetail = document.getElementById('quiz-feedback-detail');
+        const cheerBox = document.getElementById('idol-cheer-box');
+        const cheerGroup = document.getElementById('idol-group');
+        const cheerName = document.getElementById('idol-name');
+        const cheerText = document.getElementById('idol-bubble-text');
+
+        let isCorrect = (selected === data.answer);
+        data.timesPlayed = (data.timesPlayed || 0) + 1;
+
+        cheerGroup.innerText = currentIdol.group;
+        cheerName.innerText = currentIdol.name;
+        cheerName.style.color = currentIdol.color;
+        cheerBox.querySelector('.idol-bubble').style.borderColor = currentIdol.color;
+
+        if (isCorrect) {
+            data.correctCount = (data.correctCount || 0) + 1;
+            data.lastStatus = "正解";
+            currentScore += 10;
+            document.getElementById('score-display').innerText = `SCORE: ${currentScore}`;
+            buttonElement.style.backgroundColor = '#2ECC71';
+            buttonElement.style.color = 'white';
+            buttonElement.style.borderColor = '#2ECC71';
+            cheerText.innerText = currentIdol.correct;
+        } else {
+            data.incorrectCount = (data.incorrectCount || 0) + 1;
+            data.lastStatus = "不正解";
+            buttonElement.style.backgroundColor = '#E74C3C';
+            buttonElement.style.color = 'white';
+            buttonElement.style.borderColor = '#E74C3C';
+            
+            optionBtns.forEach(btn => {
+                if (btn.innerText === data.answer) {
+                    btn.style.borderColor = '#2ECC71';
+                    btn.style.backgroundColor = '#E8F8F5';
+                }
+            });
+            cheerText.innerText = currentIdol.incorrect;
+        }
+
+        document.getElementById('quiz-question').innerHTML = data.sentence.replace("______", `<span class="blank">${data.answer}</span>`);
+
+        feedbackDetail.innerHTML = `
+            <strong>【フレーズ】</strong> ${data.expression}<br>
+            <strong>【日本語訳】</strong> ${data.translation}<br><br>
+            <strong>💡解説：</strong><br>${data.explanation}
+        `;
+
+        cheerBox.style.display = 'block';
+        feedbackBox.style.display = 'block';
+        document.getElementById('quiz-next-btn').style.display = 'block';
+
+        currentSessionResults.push({
+            id: data.id,
+            meaning: data.meaning,
+            expression: data.expression,
+            fullSentence: data.sentence.replace("______", `<u><strong>${data.answer}</strong></u>`),
+            translation: data.translation,
+            explanation: data.explanation,
+            isCorrect: isCorrect
+        });
+    }
+
+    function handleNext() {
+        queueIndex++;
+        if (queueIndex < currentQueue.length) {
+            pickRandomIdol();
+            loadQuizQuestion();
+        } else {
+            showResultScreen();
+        }
+    }
+
+    function showResultScreen() {
+        showScreen('result-screen');
+        document.getElementById('result-title').innerHTML = `全問終了！獲得スコア: <strong>${currentScore} 点</strong>`;
+        
+        const reviewListContainer = document.getElementById('result-review-list');
+        reviewListContainer.innerHTML = '';
+
+        currentSessionResults.forEach((res) => {
+            const item = document.createElement('div');
+            item.className = `review-item ${res.isCorrect ? 'correct' : 'incorrect'}`;
+            item.innerHTML = `
+                <div class="review-header" onclick="toggleAccordion(this)">
+                    <span>${res.isCorrect ? '〇' : '×'} 第${res.id}問: ${res.meaning}</span>
+                    <span>▼</span>
+                </div>
+                <div class="review-body">
+                    <strong>【フレーズ】</strong> ${res.expression}<br>
+                    <strong>【英文】</strong> ${res.fullSentence}<br><br>
+                    <strong>【訳】</strong> ${res.translation}<br><br>
+                    <strong>【解説】</strong> ${res.explanation}
+                </div>
+            `;
+            reviewListContainer.appendChild(item);
+        });
+    }
+
+    function toggleAccordion(header) {
+        const body = header.nextElementSibling;
+        const isVisible = body.style.display === 'block';
+        body.style.display = isVisible ? 'none' : 'block';
+        header.querySelector('span:last-child').innerText = isVisible ? '▼' : '▲';
+    }
+
+    function goToTop() {
+        renderTopScreen();
+    }
+
+    function showScreen(screenId) {
+        const screens = ['top-screen', 'quiz-screen', 'result-screen'];
+        screens.forEach(id => {
+            document.getElementById(id).classList.remove('active');
+        });
+        document.getElementById(screenId).classList.add('active');
+    }
+</script>
+
+</body>
+</html>
