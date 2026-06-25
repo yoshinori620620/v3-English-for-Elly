@@ -57,6 +57,9 @@
         .feedback-box { margin-top: 15px; padding: 15px; border-radius: 12px; display: none; background-color: #F8FAFC; border: 1px solid #E2E8F0; }
         .feedback-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; color: #2C3E50; border-bottom: 1px solid #E2E8F0; padding-bottom: 4px; }
         .feedback-detail { color: #2C3E50; font-size: 13px; line-height: 1.6; }
+        .audio-btn-container { display: flex; gap: 8px; margin-top: 10px; margin-bottom: 10px; }
+        .audio-speech-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: bold; border-radius: 8px; border: 1px solid #FFB6C1; background-color: #FFF; color: #FF1493; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .audio-speech-btn:hover { background-color: #FFF5F7; }
         .action-btn { margin-top: 15px; width: 100%; background-color: #FF1493; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .review-list { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
         .review-item { border-radius: 8px; border: 1px solid #FFD1DC; overflow: hidden; }
@@ -101,7 +104,11 @@
             <div class="idol-bubble" id="idol-bubble-text"></div>
         </div>
         <div class="feedback-box" id="quiz-feedback">
-            <div class="feedback-title" id="quiz-feedback-title">💡 正解の解説・ニュアンス</div>
+            <div class="feedback-title">💡 正解の解説・ニュアンス</div>
+            <div class="audio-btn-container">
+                <button class="audio-speech-btn" onclick="speakEnglish()">🔊 英文を聴く (US)</button>
+                <button class="audio-speech-btn" onclick="speakJapanese()">🔊 解説を聴く (JP)</button>
+            </div>
             <div class="feedback-detail" id="quiz-feedback-detail"></div>
         </div>
         <button class="action-btn" id="quiz-next-btn" style="display:none;" onclick="handleNext()">次の問題へ 👉</button>
@@ -121,29 +128,28 @@
         { name: "目黒蓮", group: "Snow Man", color: "#222222", correct: "正解。すごいじゃん、集中して頑張ってるのちゃんと見てたよ。🖤", incorrect: "おしい。焦らなくていいからね。次は絶対あたるよ、自分を信じて。👍" },
         { name: "目黒蓮", group: "Snow Man", color: "#222222", correct: "よし大正解。一歩一歩、合格に近づいてる。お前のがんばり、本当に尊敬する。🖤", incorrect: "どんまい。ミスを恐れないで。次の一問も、俺が隣でしっかり見てるから。" },
         { name: "ラウール", group: "Snow Man", color: "#FFB6C1", correct: "Wow!! 大正解！すごーい、完璧すぎて僕もめちゃくちゃ嬉しい！🤍", incorrect: "大丈夫だよ！今のミスは次へのステップ！次、カッコよく決めちゃって！✨" },
-        { name: "渡辺翔太", group: "Snow Man", color: "#3498db", correct: "やるじゃん。正直かなりカッコよかったわ、その調子！💙", incorrect: "あーおしい！でも全然気にするなって。次、サクッと当てちゃおうぜ。👊" },
+        { name: "渡辺翔太", group: "Snow Man", color: "#3498db", correct: "やるじゃん。正直かなりカッコよかったわ、その調子！💙", incorrect: "あーおしい！端から見たらめっちゃ惜しかった。次、サクッと当てちゃおうぜ。👊" },
         { name: "向井康二", group: "Snow Man", color: "#e67e22", correct: "大正解や！ゴイゴイスー！英検3級合格へ、スーを差し上げます！🧡", incorrect: "どんまいどんまい！あったかい塩麹パワー送るから、次で一発リベンジしよな！" },
         { name: "阿部亮平", group: "Snow Man", color: "#2ecc71", correct: "素晴らしい！完璧な解答だね！この調子で合格を掴み取ろう！💚", incorrect: "おしいなぁ。でもこの間違いで知識が1つ強くなったよ。次はきっと解ける！" },
         { name: "岩本照", group: "Snow Man", color: "#f1c40f", correct: "ナイス！完璧な一撃。脳のビルドアップ、順調に進んでるね！💛", incorrect: "ドンマイ。負荷がかかるほど成長する。次の1問、きっちり仕留めにいこう！" },
         { name: "深澤辰哉", group: "Snow Man", color: "#9b59b6", correct: "よっしゃ正解！ふっかさん感動しちゃった！お前マジですげえよ！💜", incorrect: "あちゃーミスった？大丈夫、ふっかさんが全部受け止めてやるから次いこ次！" },
         { name: "宮舘涼太", group: "Snow Man", color: "#e74c3c", correct: "美しい正解だ。君の冴え渡る知性、実に素晴らしい。❤️", incorrect: "気にする必要はないよ。気品を保ちつつ、次のチャンスを華麗に掴み取ろう。" },
         { name: "永瀬廉", group: "King & Prince", color: "#2C3E50", correct: "正解！めっちゃすごいやん。お前の頑張り、ちゃんと届いてるで。🖤", incorrect: "あーおしい！まぁまぁ、おっけおっけ！次でしっかり取り返そうや、な？" },
-        { name: "高橋海人", group: "King & Prince", color: "#f1c40f", correct: "すごーい大正解！ひまわりみたいな満開の笑顔になっちゃう！イイね！💛", incorrect: "うわぁおしい！でも大丈夫、海ちゃんがずっと隣で応援してるから次がんばろ！" },
+        { name: "高橋海人", group: "King & Prince", color: "#f1c40f", correct: "すごーい大正解！ひまわりみたいな満開 of 笑顔になっちゃう！💛", incorrect: "うわぁおしい！でも大丈夫、海ちゃんがずっと隣で応援してるから次がんばろ！" },
         { name: "平野紫耀", group: "King & Prince(OG)", color: "#e74c3c", correct: "よっしゃ正解！お前マジで天才！脳みそフル回転で超カッコいい！❤️", incorrect: "あちゃー！でもどんまいどんまい！俺なんていつも間違えるから大丈夫！次いこ！" },
         { name: "岸優太", group: "King & Prince(OG)", color: "#9b59b6", correct: "うおおお正解！マジリスペクトっす！合格間違いなし！！💜", incorrect: "ドンマイっす！気合い入れ直して、次でバシッと決めちゃってください！" },
         { name: "ジェシー", group: "SixTONES", color: "#e74c3c", correct: "正解！！ハハハ！素晴らしい！まさにAHAHAHAだね！Good job!❤️", incorrect: "オーマイガッ！ドンマイ！ズドン！！次は絶対いけるからスマイルで行こう！" },
-        { name: "京本大我", group: "SixTONES", color: "#FFD1DC", correct: "大正解！君のその解答、まるで美しいメロディのようだね。素敵だよ。🩷", incorrect: "おしいな…。でもね、ここからの巻き返しが一番美しいんだよ。次、期待してるね。" },
+        { name: "京本大我", group: "SixTONES", color: "#FFD1DC", correct: "大正解！君のその解答、まるで美しいメロディのようだね。素敵だよ。🩷", incorrect: "おしいな…。でもね、ここからの巻き返しが一番美しいんだよ。次,期待してるね。" },
         { name: "松村北斗", group: "SixTONES", color: "#222222", correct: "正解。…やるね。君が努力してる成果がちゃんと形になってて素晴らしいよ。🖤", incorrect: "ミスは誰にでもある。大切なのは、それを引きずらずに次の一手に集中することだよ。" },
         { name: "田中樹", group: "SixTONES", color: "#3498db", correct: "よっしゃ正解！お前マジでイケてんじゃん！最高、その調子でブチ上げようぜ！💙", incorrect: "あーミスったか！まぁそんな時もあるって。次ガツンと正解して、俺らを見返してくれよ。" },
         { name: "森本慎太郎", group: "SixTONES", color: "#2ecc71", correct: "うおっしゃ正解！パワー全開だね！最高に気持ちいい！！💚", incorrect: "どんまいどんまい！元気出していこうぜ！次はドカンと大正解ぶちかまそう！" },
         { name: "高地優吾", group: "SixTONES", color: "#f1c40f", correct: "大正解！日々笑顔で頑張った成果が出たね！おめでとう！💛", incorrect: "おしいっ！外れても下向かないで日々笑顔！次の一問、楽しんでいこう！" }
     ];
 
-    // 英検3級の頻出問題をベースとした300問のテンプレート生成プール
     const rawCategories = [
         { type: "【重要単語】名詞", word: "century (世紀)", q: "This castle was built in the 15th ______.", a: "century", o: ["century", "culture", "season"], t: "このお城は15世紀に建てられました。", ex: "centuryは「世紀」「100年間」を意味する重要な名詞です。15th centuryで「15世紀」となります。" },
         { type: "【重要単語】動詞", word: "agree (同意する)", q: "I ______ with your plan. Let's do it.", a: "agree", o: ["agree", "decide", "complain"], t: "私はあなたの計画に同意します。それをやりましょう。", ex: "agree with 〜 で「〜に同意する、賛成する」という最頻出の組み合わせです。" },
-        { type: "【重要熟語】動作", word: "take part in (〜に参加する)", q: "Many students will take ______ in the school festival.", answer: "part", q: "Many students will take ______ in the school festival.", a: "part", o: ["care", "part", "place"], t: "たくさんの生徒が文化祭に参加する予定です。", ex: "take part in 〜 は「〜に参加する」という意味の重要熟語です。join と同じ意味です。" },
+        { type: "【重要熟語】動作", word: "take part in (〜に参加する)", q: "Many students will take ______ in the school festival.", a: "part", o: ["care", "part", "place"], t: "たくさんの生徒が文化祭に参加する予定です。", ex: "take part in 〜 は「〜に参加する」という意味の重要熟語です。join と同じ意味です。" },
         { type: "【重要熟語】会話", word: "look forward to (楽しみに待つ)", q: "I am looking forward ______ seeing you next week.", a: "to", o: ["for", "to", "at"], t: "来週あなたに会えるのを楽しみにしています。", ex: "look forward to 〜 の後ろには動詞のing形（動名詞）が来ます。" },
         { type: "【重要文法】現在完了形", word: "has lived (ずっと住んでいる)", q: "Ken ______ lived in Tokyo for five years.", a: "has", o: ["has", "have", "is"], t: "ケンは5年間ずっと東京に住んでいます。", ex: "「have/has + 過去分詞」で現在完了形を作ります。Kenは三人称単数なのでhasを選びます。" },
         { type: "【重要文法】受動態", word: "was written (書かれた)", q: "This book ______ written by a famous writer.", a: "was", o: ["is", "was", "been"], t: "この本は有名な作家によって書かれました。", ex: "「be動詞 + 過去分詞 + by 〜」で「〜によって…される」という受け身になります。" },
@@ -153,12 +159,9 @@
         { type: "【重要熟語】時間", word: "at first (最初は)", q: "______ first, I didn't like tomatoes, but now I do.", a: "At", o: ["In", "At", "On"], t: "最初、私はトマトが好きではありませんでしたが、今は好きです。", ex: "at firstで「最初は、当初は」というフレーズになります。" }
     ];
 
-    // 300問の連番データを完全にメモリ上で展開するロジック
     const fullMasterData = [];
     for (let i = 1; i <= 300; i++) {
         let template = rawCategories[(i - 1) % rawCategories.length];
-        
-        // 300問全て異なるバリエーションとして認識させるためのデータパッチ
         let uniqueType = template.type;
         if (i > 10) uniqueType += ` (応用編Lv.${Math.floor(i/10)})`;
 
@@ -184,6 +187,7 @@
     let isAnswered = false;
     let currentSessionResults = [];
     let currentIdol = null;
+    let currentActiveData = null;
 
     window.onload = function() {
         renderTopScreen();
@@ -195,12 +199,10 @@
         
         const cardListContainer = document.getElementById('problem-card-list');
         cardListContainer.innerHTML = '';
-
         let hasIncorrect = false;
 
         fullMasterData.forEach(item => {
             if (item.lastStatus === "不正解") hasIncorrect = true;
-
             let badgeClass = "status-unseen";
             if (item.lastStatus === "正解") badgeClass = "status-correct";
             if (item.lastStatus === "不正解") badgeClass = "status-incorrect";
@@ -242,7 +244,6 @@
         document.getElementById('app-nav').style.display = 'flex';
 
         if (mode === 'random') {
-            // 全300問からランダムに10問選出
             let allIds = fullMasterData.map(item => item.id);
             allIds.sort(() => Math.random() - 0.5);
             currentQueue = allIds.slice(0, 10);
@@ -278,20 +279,22 @@
 
     function loadQuizQuestion() {
         isAnswered = false;
-        const activeId = currentQueue[queueIndex];
-        const questionData = fullMasterData.find(item => item.id === activeId);
+        window.speechSynthesis.cancel();
 
-        document.getElementById('quiz-theme').innerText = `第${questionData.id}問 のテーマ：「${questionData.meaning}」`;
-        document.getElementById('quiz-question').innerHTML = questionData.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
+        const activeId = currentQueue[queueIndex];
+        currentActiveData = fullMasterData.find(item => item.id === activeId);
+
+        document.getElementById('quiz-theme').innerText = `第${currentActiveData.id}問: ${currentActiveData.meaning}`;
+        document.getElementById('quiz-question').innerHTML = currentActiveData.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
         
         const optionsBox = document.getElementById('quiz-options');
         optionsBox.innerHTML = '';
 
-        questionData.options.forEach(opt => {
+        currentActiveData.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt;
-            btn.onclick = () => checkQuizAnswer(opt, btn, questionData);
+            btn.onclick = () => checkQuizAnswer(opt, btn, currentActiveData);
             optionsBox.appendChild(btn);
         });
 
@@ -370,6 +373,41 @@
         });
     }
 
+    // 🔊 アメリカンネイティブ音声 優先選出＆再生ロジック
+    function speakEnglish() {
+        if (!currentActiveData) return;
+        window.speechSynthesis.cancel();
+        
+        const rawSentence = currentActiveData.sentence.replace("______", currentActiveData.answer);
+        const uttr = new SpeechSynthesisUtterance(rawSentence);
+        
+        const voices = window.speechSynthesis.getVoices();
+        let selectedVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium')));
+        if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith('en-US') || v.lang.startsWith('en_US'));
+        
+        if (selectedVoice) uttr.voice = selectedVoice;
+        uttr.lang = "en-US";
+        uttr.rate = 0.85; 
+        window.speechSynthesis.speak(uttr);
+    }
+
+    function speakJapanese() {
+        if (!currentActiveData) return;
+        window.speechSynthesis.cancel();
+        
+        const text = `訳。${currentActiveData.translation}。解説。${currentActiveData.explanation}`;
+        const uttr = new SpeechSynthesisUtterance(text);
+        
+        const voices = window.speechSynthesis.getVoices();
+        let selectedVoice = voices.find(v => v.lang === 'ja-JP' && (v.name.includes('Google') || v.name.includes('Siri')));
+        if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith('ja'));
+        
+        if (selectedVoice) uttr.voice = selectedVoice;
+        uttr.lang = "ja-JP";
+        uttr.rate = 1.0;
+        window.speechSynthesis.speak(uttr);
+    }
+
     function handleNext() {
         queueIndex++;
         if (queueIndex < currentQueue.length) {
@@ -381,6 +419,7 @@
     }
 
     function showResultScreen() {
+        window.speechSynthesis.cancel();
         showScreen('result-screen');
         document.getElementById('result-title').innerHTML = `特訓終了！今回のスコア: <strong>${currentScore} 点</strong>`;
         
@@ -414,11 +453,12 @@
     }
 
     function goToTop() {
+        window.speechSynthesis.cancel();
         renderTopScreen();
     }
 
-    // 🚪 最初のピンクのポータル画面へ戻る関数
     function goToPortal() {
+        window.speechSynthesis.cancel();
         window.location.href = "../index.html";
     }
 
@@ -428,6 +468,10 @@
             document.getElementById(id).classList.remove('active');
         });
         document.getElementById(screenId).classList.add('active');
+    }
+    
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
     }
 </script>
 </body>
