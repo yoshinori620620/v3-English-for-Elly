@@ -57,6 +57,9 @@
         .feedback-box { margin-top: 15px; padding: 15px; border-radius: 12px; display: none; background-color: #F8FAFC; border: 1px solid #E2E8F0; }
         .feedback-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; color: #2C3E50; border-bottom: 1px solid #E2E8F0; padding-bottom: 4px; }
         .feedback-detail { color: #2C3E50; font-size: 13px; line-height: 1.6; }
+        .audio-btn-container { display: flex; gap: 8px; margin-top: 10px; margin-bottom: 10px; }
+        .audio-speech-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: bold; border-radius: 8px; border: 1px solid #FFB6C1; background-color: #FFF; color: #FF1493; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .audio-speech-btn:hover { background-color: #FFF5F7; }
         .action-btn { margin-top: 15px; width: 100%; background-color: #FF1493; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .review-list { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
         .review-item { border-radius: 8px; border: 1px solid #FFD1DC; overflow: hidden; }
@@ -101,7 +104,11 @@
             <div class="idol-bubble" id="idol-bubble-text"></div>
         </div>
         <div class="feedback-box" id="quiz-feedback">
-            <div class="feedback-title" id="quiz-feedback-title">💡 正解の解説・ニュアンス</div>
+            <div class="feedback-title">💡 正解の解説・ニュアンス</div>
+            <div class="audio-btn-container">
+                <button class="audio-speech-btn" onclick="speakEnglish()">🔊 英文を聴く (US)</button>
+                <button class="audio-speech-btn" onclick="speakJapanese()">🔊 解説を聴く (JP)</button>
+            </div>
             <div class="feedback-detail" id="quiz-feedback-detail"></div>
         </div>
         <button class="action-btn" id="quiz-next-btn" style="display:none;" onclick="handleNext()">次の問題へ 👉</button>
@@ -126,25 +133,22 @@
         { name: "田中樹", group: "SixTONES", color: "#3498db", correct: "よっしゃ正解！お前マジでイケてんじゃん！最高、その調子でブチ上げようぜ！💙", incorrect: "あーミスったか！まぁそんな時もあるって。次ガツンと正解して、俺らを見返してくれよ。" }
     ];
 
-    // メルマガ由来の厳選日常会話15パターンのベーステンプレート
     const rawDailyCategories = [
         { type: "空気を読む・察する", word: "Take the hint", q: "He’s oblivious and doesn’t know how to ______ a hint.", a: "take", o: ["take", "get", "read"], t: "彼は鈍感で、空気を読むことができない。", ex: "人の意図を悟ったり気持ちを察したりすることを意味し、「空気を読む」に相当します。一般的には“take a hint”を使います。" },
-        { type: "大目に見る・勘弁する", word: "Cut someone some slack", q: "He's new to the job, so ______ him some slack.", a: "cut", o: ["cut", "take", "give"], t: "彼は新人なんだから、大目に見（勘弁して）あげなよ。", ex: "直訳は「誰かにロープのたるみを与える」。相手に少し余裕を持たせたり、厳しい追及を控えたりして「大目に見る」という意味で使われます。" },
+        { type: "大目に見る・勘弁する", word: "Cut some slack", q: "He's new to the job, so ______ him some slack.", a: "cut", o: ["cut", "take", "give"], t: "彼は新人なんだから、大目に見（勘弁して）あげなよ。", ex: "直訳は「誰かにロープのたるみを与える」。相手に少し余裕を持たせたり、厳しい追及を控えたりして「大目に見る」という意味で使われます。" },
         { type: "状況を見守る・流れに任せる", word: "Play it by ear", q: "We don't have a solid plan for tomorrow, so let's just ______ it by ear.", a: "play", o: ["play", "do", "run"], t: "明日の確実な計画はないから、その場の流れで決めよう。", ex: "元々は「楽譜を見ずに即興で演奏する」が由来。事前に計画を立てず、その場の状況に合わせて柔軟に対応する意味です。" },
         { type: "本音を吐く・ぶっちゃける", word: "Spill the beans", q: "Don't ______ the beans about the surprise party!", a: "spill", o: ["drop", "spill", "throw"], t: "サプライズパーティーのことをバラさないでね！", ex: "秘密をうっかり漏らす、あるいは「実はさ…」と隠していたことを白状する時に使います。" },
-        { type: "もうお手上げ・今日は切り上げる", word: "Call it a day", q: "We’ve been working for ten hours, let's ______ it a day.", answer: "call", q: "We’ve been working for ten hours, let's ______ it a day.", a: "call", o: ["make", "call", "finish"], t: "10時間も働いたんだから、今日はもう終わりにしよう。", ex: "その日の仕事や活動を「今日はここまでにして終わりにしよう」と切り上げる時の定番日常表現です。" },
-        { type: "勘違いする・お門違い", word: "Bark up the wrong tree", q: "If you think I took your money, you're barking up the wrong ______.", a: "tree", o: ["dog", "bush", "tree"], t: "僕がお金を盗んだと思っているなら、それはお門違いだよ。", ex: "猟犬が獲物のいない間違った木に向かって吠える様子が由来。「見当違いの努力や疑い」を指します。" },
-        { type: "完全に同意する・意見が合う", word: "See eye to eye", q: "My boss and I don't always see eye ______ eye on project details.", answer: "to", q: "My boss and I don't always see eye ______ eye on project details.", a: "to", o: ["to", "with", "for"], t: "上司と私、プロジェクトの詳細についていつも意見が一致するわけではない。", ex: "お互いの目と目が同じ高さにある、つまり「視点・意見がぴったり一致する」という意味です。" },
+        { type: "もうお手上げ・今日は切り上げる", word: "Call it a day", q: "We’ve been working for ten hours, let's ______ it a day.", a: "call", o: ["make", "call", "finish"], t: "10時間も働いたんだから、今日はもう終わりにしよう。", ex: "その日の仕事や活動を「今日はここまでにして終わりにしよう」と切り上げる時の定番日常表現です。" },
+        { type: "勘違いする・お門違い", word: "Bark up the wrong tree", q: "If you think I took your money, you're barking up the wrong ______.", a: "tree", o: ["dog", "bush", "tree"], t: "僕がお慢でお金を盗んだと思っているなら、それはお門違いだよ。", ex: "猟犬が獲物のいない間違った木に向かって吠える様子が由来。「見当違いの努力や疑い」を指します。" },
+        { type: "完全に同意する・意見が合う", word: "See eye to eye", q: "My boss and I don't always see eye ______ eye on project details.", a: "to", o: ["to", "with", "for"], t: "上司と私、プロジェクトの詳細についていつも意見が一致するわけではない。", ex: "お互いの目と目が同じ高さにある、つまり「視点・意見がぴったり一致する」という意味です。" },
         { type: "話をはぐらかす・遠回しに言う", word: "Beat around the bush", q: "Stop beating around the ______ and tell me what you really want.", a: "bush", o: ["bush", "tree", "wall"], t: "話をはぐらかすのはやめて、本当に欲しいものを言ってよ。", ex: "本題に入らずに、遠回しな言い方をしたり核心を避けたりする様子を表します。" },
-        { type: "とても簡単・朝飯前", word: "A piece of cake", q: "The exam was a ______ of cake, I'm sure I passed.", a: "piece", o: ["slice", "piece", "cup"], t: "試験は朝飯前だったよ、絶対に合格してるね。", ex: "ケーキを食べるのが簡単なように、何の苦労もなく簡単にできることを指します。" },
+        { type: "とても簡単・楽勝", word: "A piece of cake", q: "The exam was a ______ of cake, I'm sure I passed.", a: "piece", o: ["slice", "piece", "cup"], t: "試験は朝飯前だったよ、絶対に合格してるね。", ex: "ケーキを食べるのが簡単なように、何の苦労もなく簡単にできることを指します。" },
         { type: "一晩じっくり考える", word: "Sleep on it", q: "That's a huge investment, so I need to ______ on it before deciding.", a: "sleep", o: ["sleep", "think", "wait"], t: "それは巨額の投資なので、決める前に一晩じっくり考える必要があります。", ex: "焦って答えを出さず、「一晩寝て頭をすっきりさせてから考える」という時に使います。" }
     ];
 
-    // 日常英会話も300問フルで展開するロジック
     const fullMasterData = [];
     for (let i = 1; i <= 300; i++) {
         let template = rawDailyCategories[(i - 1) % rawDailyCategories.length];
-        
         let uniqueType = template.type;
         if (i > 10) uniqueType += ` (日常表現編Lv.${Math.floor(i/10)})`;
 
@@ -170,6 +174,7 @@
     let isAnswered = false;
     let currentSessionResults = [];
     let currentIdol = null;
+    let currentActiveData = null;
 
     window.onload = function() {
         renderTopScreen();
@@ -181,12 +186,10 @@
         
         const cardListContainer = document.getElementById('problem-card-list');
         cardListContainer.innerHTML = '';
-
         let hasIncorrect = false;
 
         fullMasterData.forEach(item => {
             if (item.lastStatus === "不正解") hasIncorrect = true;
-
             let badgeClass = "status-unseen";
             if (item.lastStatus === "正解") badgeClass = "status-correct";
             if (item.lastStatus === "不正解") badgeClass = "status-incorrect";
@@ -228,7 +231,6 @@
         document.getElementById('app-nav').style.display = 'flex';
 
         if (mode === 'random') {
-            // 全300問から10問をランダムピック
             let allIds = fullMasterData.map(item => item.id);
             allIds.sort(() => Math.random() - 0.5);
             currentQueue = allIds.slice(0, 10);
@@ -264,20 +266,22 @@
 
     function loadQuizQuestion() {
         isAnswered = false;
-        const activeId = currentQueue[queueIndex];
-        const questionData = fullMasterData.find(item => item.id === activeId);
+        window.speechSynthesis.cancel();
 
-        document.getElementById('quiz-theme').innerText = `第${questionData.id}問 のテーマ：「${questionData.meaning}」`;
-        document.getElementById('quiz-question').innerHTML = questionData.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
+        const activeId = currentQueue[queueIndex];
+        currentActiveData = fullMasterData.find(item => item.id === activeId);
+
+        document.getElementById('quiz-theme').innerText = `第${currentActiveData.id}問 のテーマ：「${currentActiveData.meaning}」`;
+        document.getElementById('quiz-question').innerHTML = currentActiveData.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
         
         const optionsBox = document.getElementById('quiz-options');
         optionsBox.innerHTML = '';
 
-        questionData.options.forEach(opt => {
+        currentActiveData.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt;
-            btn.onclick = () => checkQuizAnswer(opt, btn, questionData);
+            btn.onclick = () => checkQuizAnswer(opt, btn, currentActiveData);
             optionsBox.appendChild(btn);
         });
 
@@ -356,6 +360,42 @@
         });
     }
 
+    // 🔊 アメリカンネイティブ音声 優先選出＆再生ロジック
+    function speakEnglish() {
+        if (!currentActiveData) return;
+        window.speechSynthesis.cancel(); 
+        
+        const rawSentence = currentActiveData.sentence.replace("______", currentActiveData.answer);
+        const uttr = new SpeechSynthesisUtterance(rawSentence);
+        
+        // 端末内の全音声から英語(US)に一番適したリアルなネイティブ声を探し出す
+        const voices = window.speechSynthesis.getVoices();
+        let selectedVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium')));
+        if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith('en-US') || v.lang.startsWith('en_US'));
+        
+        if (selectedVoice) uttr.voice = selectedVoice;
+        uttr.lang = "en-US";
+        uttr.rate = 0.9; 
+        window.speechSynthesis.speak(uttr);
+    }
+
+    function speakJapanese() {
+        if (!currentActiveData) return;
+        window.speechSynthesis.cancel();
+        
+        const text = `訳。${currentActiveData.translation}。解説。${currentActiveData.explanation}`;
+        const uttr = new SpeechSynthesisUtterance(text);
+        
+        const voices = window.speechSynthesis.getVoices();
+        let selectedVoice = voices.find(v => v.lang === 'ja-JP' && (v.name.includes('Google') || v.name.includes('Siri')));
+        if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith('ja'));
+        
+        if (selectedVoice) uttr.voice = selectedVoice;
+        uttr.lang = "ja-JP";
+        uttr.rate = 1.0;
+        window.speechSynthesis.speak(uttr);
+    }
+
     function handleNext() {
         queueIndex++;
         if (queueIndex < currentQueue.length) {
@@ -367,6 +407,7 @@
     }
 
     function showResultScreen() {
+        window.speechSynthesis.cancel();
         showScreen('result-screen');
         document.getElementById('result-title').innerHTML = `特訓終了！今回のスコア: <strong>${currentScore} 点</strong>`;
         
@@ -400,11 +441,12 @@
     }
 
     function goToTop() {
+        window.speechSynthesis.cancel();
         renderTopScreen();
     }
 
-    // 🚪 最初のピンクのポータル画面へ一発で戻る関数
     function goToPortal() {
+        window.speechSynthesis.cancel();
         window.location.href = "../index.html";
     }
 
@@ -414,6 +456,11 @@
             document.getElementById(id).classList.remove('active');
         });
         document.getElementById(screenId).classList.add('active');
+    }
+    
+    // 一部のブラウザで音声リストのロードが遅れるバグを防ぐトリガー
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
     }
 </script>
 </body>
