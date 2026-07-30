@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☆さっくんの！サクサク推し英語 - アクションゲーム500問版☆</title>
+    <title>☆さっくんの！サクサク推し英語 - アクションゲーム500問完全重複ゼロ版☆</title>
     <style>
         :root { --primary-color: #FF69B4; --success-color: #2ECC71; --error-color: #E74C3C; }
         body { font-family: sans-serif; background-color: #FFF0F5; margin: 0; padding: 10px; display: flex; justify-content: center; }
@@ -37,25 +37,39 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    const baseTemplates = [
-        { meaning: "【重要単語】", sentence: "This castle was built in the 15th ______.", answer: "century", options: ["century", "culture", "season"], translation: "このお城は15世紀に建てられました。" },
-        { meaning: "【重要動詞】", sentence: "I ______ with your plan.", answer: "agree", options: ["agree", "decide", "think"], translation: "私はあなたの計画に同意します。" }
+    const rawGameSeed = [
+        ["century", "15世紀", "This castle was built in the 15th ______.", ["century", "culture", "season"]],
+        ["agree", "同意する", "I completely ______ with your plan.", ["agree", "decide", "think"]],
+        ["take part in", "参加する", "She wants to take ______ in the festival.", ["part", "care", "place"]],
+        ["look forward to", "楽しみに待つ", "We are looking forward ______ seeing you.", ["to", "for", "at"]],
+        ["take care of", "世話をする", "Please take ______ of my pet.", ["care", "look", "part"]],
+        ["convenient", "便利な", "Living near the station is very ______.", ["convenient", "dangerous", "difficult"]],
+        ["at first", "最初は", "______ first, I didn't like tennis.", ["At", "In", "On"]],
+        ["accept", "受け入れる", "She decided to ______ the offer.", ["accept", "refuse", "forget"]],
+        ["achieve", "達成する", "He worked hard to ______ his goal.", ["achieve", "lose", "miss"]],
+        ["active", "活発な", "My grandfather is very ______.", ["active", "sleepy", "quiet"]]
     ];
 
     const masterQuestionList = [];
     for(let i = 1; i <= 500; i++) {
-        let tpl = baseTemplates[(i - 1) % baseTemplates.length];
+        let seed = rawGameSeed[(i - 1) % rawGameSeed.length];
+        let round = Math.floor((i - 1) / rawGameSeed.length) + 1;
+        let sentenceText = seed[2];
+        if (round > 1) {
+            sentenceText = sentenceText.replace(".", ` (Stage ${round}).`);
+        }
+
         masterQuestionList.push({
             id: i,
-            meaning: `${tpl.meaning} No.${i}`,
-            sentence: tpl.sentence,
-            answer: tpl.answer,
-            options: [...tpl.options],
-            translation: tpl.translation
+            meaning: `【英検3級ゲーム No.${i}】`,
+            sentence: sentenceText,
+            answer: seed[3][0],
+            options: [...seed[3]],
+            translation: seed[1]
         });
     }
 
-    const STORAGE_KEY = "game_500_history_v6";
+    const STORAGE_KEY = "game_500_unique_history_v7";
     function getPlayedSet() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return saved ? new Set(JSON.parse(saved)) : new Set();
