@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☆さっくんの！サクサク推し英語 - アクションゲーム500問完全独立版☆</title>
+    <title>☆さっくんの！サクサク推し英語 - アクションゲーム版☆</title>
     <style>
         :root { --primary-color: #FF69B4; --success-color: #2ECC71; --error-color: #E74C3C; }
         body { font-family: sans-serif; background-color: #FFF0F5; margin: 0; padding: 10px; display: flex; justify-content: center; }
@@ -37,33 +37,42 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    const rawGameSeed = [
-        ["century", "15世紀", "This castle was built in the 15th ______.", ["century", "culture", "season"]],
-        ["agree", "同意する", "I completely ______ with your plan.", ["agree", "decide", "think"]],
-        ["take part in", "参加する", "She wants to take ______ in the festival.", ["part", "care", "place"]],
-        ["look forward to", "楽しみに待つ", "We are looking forward ______ seeing you.", ["to", "for", "at"]],
-        ["take care of", "世話をする", "Please take ______ of my pet.", ["care", "look", "part"]],
-        ["convenient", "便利な", "Living near the station is very ______.", ["convenient", "dangerous", "difficult"]],
-        ["at first", "最初は", "______ first, I didn't like tennis.", ["At", "In", "On"]],
-        ["accept", "受け入れる", "She decided to ______ the offer.", ["accept", "refuse", "forget"]],
-        ["achieve", "達成する", "He worked hard to ______ his goal.", ["achieve", "lose", "miss"]],
-        ["active", "活発な", "My grandfather is very ______.", ["active", "sleepy", "quiet"]]
+    // 🌟 全て中身が異なる独立した英検3級単語・熟語問題データセット（重複一切なし）
+    const masterQuestionList = [
+        { id: 1, sentence: "This castle was built in the 15th ______.", answer: "century", options: ["century", "culture", "season"], translation: "このお城は15世紀に建てられました。" },
+        { id: 2, sentence: "I completely ______ with your opinion.", answer: "agree", options: ["agree", "decide", "complain"], translation: "私はあなたの意見に完全に同意します。" },
+        { id: 3, sentence: "She wants to take ______ in the speech contest.", answer: "part", options: ["part", "care", "place"], translation: "彼女はスピーチコンテストに参加したい。" },
+        { id: 4, sentence: "We are looking forward ______ seeing you again.", answer: "to", options: ["to", "for", "at"], translation: "またお会いできるのを楽しみに待っています。" },
+        { id: 5, sentence: "Please take ______ of my dog while I am away.", answer: "care", options: ["care", "look", "part"], translation: "留守の間、私の犬の世話をお願いします。" },
+        { id: 6, sentence: "Living near the train station is very ______.", answer: "convenient", options: ["convenient", "dangerous", "difficult"], translation: "駅の近くに住むのはとても便利です。" },
+        { id: 7, sentence: "______ first, I found English grammar hard.", answer: "At", options: ["At", "In", "On"], translation: "最初、私は英文法が難しいと感じた。" },
+        { id: 8, sentence: "She decided to ______ the new job offer.", answer: "accept", options: ["accept", "refuse", "forget"], translation: "彼女は新しい仕事のオファーを受け入れることにした。" },
+        { id: 9, sentence: "He worked very hard to ______ his goal.", answer: "achieve", options: ["achieve", "lose", "miss"], translation: "彼は目標を達成するために一生懸命働いた。" },
+        { id: 10, sentence: "My grandfather is still very ______ at 80.", answer: "active", options: ["active", "sleepy", "quiet"], translation: "私の祖父は80歳になってもまだとても活発です。" },
+        { id: 11, sentence: "High speed is a major ______ of the train.", answer: "advantage", options: ["advantage", "problem", "error"], translation: "高速移動はその列車の大きな利点です。" },
+        { id: 12, sentence: "My teacher gave me very helpful ______.", answer: "advice", options: ["advice", "news", "noise"], translation: "先生はとても役に立つ助言をくれました。" },
+        { id: 13, sentence: "I cannot ______ to buy a luxury car now.", answer: "afford", options: ["afford", "spend", "cost"], translation: "私には今高級車を買う余裕はありません。" },
+        { id: 14, sentence: "Don't be ______ of making small mistakes.", answer: "afraid", options: ["afraid", "happy", "excited"], translation: "小さな失敗を恐れないでください。" },
+        { id: 15, sentence: "My parents won't ______ me to stay out late.", answer: "allow", options: ["allow", "stop", "prevent"], translation: "両親は私が遅くまで外出するのを許さないでしょう。" },
+        { id: 16, sentence: "I have ______ finished writing the report.", answer: "almost", options: ["almost", "never", "seldom"], translation: "レポートをほとんど書き終えました。" },
+        { id: 17, sentence: "The express train has ______ left the station.", answer: "already", options: ["already", "yet", "still"], translation: "急行電車はすでに出発してしまいました。" },
+        { id: 18, sentence: "We need a large ______ of water for planting.", answer: "amount", options: ["amount", "number", "count"], translation: "植樹には大量の水が必要です。" },
+        { id: 19, sentence: "They visited an ______ pyramid in Egypt.", answer: "ancient", options: ["ancient", "modern", "future"], translation: "彼らはエジプトの古代のピラミッドを訪れました。" },
+        { id: 20, sentence: "Why are you getting so ______ at me?", answer: "angry", options: ["angry", "kind", "gentle"], translation: "なぜ私に対してそんなに怒っているのですか？" },
+        { id: 21, sentence: "The winner will be ______ tomorrow morning.", answer: "announced", options: ["announced", "hidden", "kept"], translation: "勝者は明日の朝発表されます。" },
+        { id: 22, sentence: "Would you like ______ cup of tea?", answer: "another", options: ["another", "other", "others"], translation: "お茶をもう一杯いかがですか？" },
+        { id: 23, sentence: "Please ______ my email when you read it.", answer: "answer", options: ["answer", "ask", "speak"], translation: "メールを読んだら返信（回答）してください。" },
+        { id: 24, sentence: "She felt ______ about her final examination.", answer: "anxious", options: ["anxious", "calm", "safe"], translation: "彼女は期末試験について心配（不安）に感じていた。" },
+        { id: 25, sentence: "He came over to ______ for his mistake.", answer: "apologize", options: ["apologize", "thank", "praise"], translation: "彼は自分の失敗を謝罪するためにやってきた。" },
+        { id: 26, sentence: "A beautiful rainbow ______ in the blue sky.", answer: "appeared", options: ["appeared", "disappeared", "faded"], translation: "青空に美しい虹が現れた。" },
+        { id: 27, sentence: "I decided to ______ for the scholarship.", answer: "apply", options: ["apply", "reply", "supply"], translation: "私は奨学金に応募（申請）することに決めた。" },
+        { id: 28, sentence: "I made an ______ to see the doctor at 3 PM.", answer: "appointment", options: ["appointment", "invitation", "event"], translation: "午後3時に医師の診察予約をしました。" },
+        { id: 29, sentence: "This ______ is famous for its delicious apples.", answer: "area", options: ["area", "sky", "ocean"], translation: "この地域は美味しいりんごで有名です。" },
+        { id: 30, sentence: "They always ______ about which movie to watch.", answer: "argue", options: ["argue", "agree", "smile"], translation: "彼らはどの映画を観るかでいつも議論（口論）します。" }
     ];
 
-    const masterQuestionList = [];
-    for(let i = 1; i <= 500; i++) {
-        let seed = rawGameSeed[(i - 1) % rawGameSeed.length];
-        masterQuestionList.push({
-            id: i,
-            meaning: `【英検3級アクション No.${i}】`,
-            sentence: seed[2],
-            answer: seed[3][0],
-            options: [...seed[3]],
-            translation: seed[1]
-        });
-    }
-
-    const STORAGE_KEY = "game_500_independent_v8";
+    const STORAGE_KEY = "game_eiken3_unique_history_v10";
+    
     function getPlayedSet() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return saved ? new Set(JSON.parse(saved)) : new Set();
@@ -76,14 +85,18 @@
     }
 
     let unplayedQueue = [];
+    
     function resetShuffleQueue() {
         const playedSet = getPlayedSet();
         let unseen = masterQuestionList.filter(q => !playedSet.has(q.id)).map(q => q.id);
+        
+        // 全問題（全30問）解き切ったら履歴を自動リセットして周回
         if (unseen.length === 0) {
             localStorage.removeItem(STORAGE_KEY);
             unseen = masterQuestionList.map(q => q.id);
         }
-        // 🎲 完全にランダムシャッフル
+        
+        // 未回答問題を100%完全シャッフル
         unseen.sort(() => Math.random() - 0.5);
         unplayedQueue = unseen;
     }
@@ -95,18 +108,28 @@
     let gameState = "PLAYING"; 
 
     canvas.addEventListener("mousedown", () => { if (gameState === "PLAYING") bird.velocity = bird.lift; });
+    canvas.addEventListener("touchstart", (e) => { 
+        if (gameState === "PLAYING") { e.preventDefault(); bird.velocity = bird.lift; } 
+    }, {passive: false});
 
     function setupQuestion() {
         if (unplayedQueue.length === 0) resetShuffleQueue();
         const nextId = unplayedQueue.pop();
         currentActiveQuestion = masterQuestionList.find(q => q.id === nextId);
 
-        document.getElementById("current-hint").innerText = `【第${currentActiveQuestion.id}問/500】\n「${currentActiveQuestion.translation}」\n${currentActiveQuestion.sentence}`;
+        document.getElementById("current-hint").innerText = `【第${currentActiveQuestion.id}問 / 全${masterQuestionList.length}問】\n「${currentActiveQuestion.translation}」\n${currentActiveQuestion.sentence}`;
         
         items = [];
         let shuffled = [...currentActiveQuestion.options].sort(() => Math.random() - 0.5);
         shuffled.forEach((text, index) => {
-            items.push({ x: 400 + (index * 120), y: 40 + (Math.random() * 120), text: text, isAnswer: (text === currentActiveQuestion.answer), width: 75, height: 28 });
+            items.push({ 
+                x: 400 + (index * 120), 
+                y: 40 + (Math.random() * 120), 
+                text: text, 
+                isAnswer: (text === currentActiveQuestion.answer), 
+                width: 75, 
+                height: 28 
+            });
         });
     }
 
@@ -138,6 +161,9 @@
     function triggerFeedback(isCorrect) {
         gameState = "HIT_FEEDBACK";
         markAsPlayed(currentActiveQuestion.id);
+
+        if(isCorrect) gameScore += 10;
+        document.getElementById("score-display").innerText = `SCORE: ${gameScore}`;
 
         const overlay = document.getElementById("feedback-overlay");
         document.getElementById("overlay-title").innerText = isCorrect ? "🎉 大正解！" : "😢 どんまい！";
