@@ -71,7 +71,7 @@
         </div>
         <div class="progress-banner" id="progress-summary">全500問中 0問達成（残500問）</div>
         <div class="menu-buttons">
-            <button class="main-btn btn-primary" onclick="startMode('random')">🎲 未回答のみを順番に出題（10問）</button>
+            <button class="main-btn btn-primary" onclick="startMode('random')">🎲 未回答からランダム出題（10問）</button>
             <button class="main-btn btn-warning" id="review-mode-btn" onclick="startMode('review')">🔥 弱点克服（過去ミスした問題）</button>
             <button class="main-btn" style="background-color: #7F8C8D;" onclick="goToPortal()">🚪 ポータル画面へ戻る</button>
         </div>
@@ -123,7 +123,6 @@
         return idolSupportDatabase[idolDeck.pop()];
     }
 
-    // 🌟 全500問・重複一切なし（英検3級頻出単語・熟語・文法・会話表現）
     const rawVocabularySeed = [
         ["century", "世紀", "This castle was constructed in the 15th ______.", ["century", "culture", "season"], "15世紀"],
         ["agree", "同意する", "I completely ______ with your proposal.", ["agree", "invite", "complain"], "提案に同意する"],
@@ -177,7 +176,6 @@
         ["aware", "気付いて", "She was not ______ of the danger.", ["aware", "blind", "deaf"], "危険に気付いていなかった"]
     ];
 
-    // 全500問を一切の重複なくユニークに自動拡張生成
     const masterQuestionList = [];
     for (let i = 1; i <= 500; i++) {
         let seed = rawVocabularySeed[(i - 1) % rawVocabularySeed.length];
@@ -292,16 +290,19 @@
         document.getElementById('app-nav').style.display = 'flex';
 
         if (mode === 'random') {
-            // 🛡️【完全未重複出題】未挑戦IDのみを完全に抽出し、順番に出題
+            // 🎲 未挑戦のIDを厳密に抽出して【完全にランダムシャッフル】
             let unseen = masterQuestionList.filter(i => i.lastStatus === "未挑戦").map(i => i.id);
             if (unseen.length === 0) {
                 alert("🎉 おめでとうございます！全500問をすべてクリアしました！");
                 unseen = masterQuestionList.map(i => i.id);
             }
-            unseen.sort((a, b) => a - b); // 1問目から順、またはシャッフル
+            // ランダムシャッフル処理
+            unseen.sort(() => Math.random() - 0.5);
             currentQueue = unseen.slice(0, 10);
         } else if (mode === 'review') {
-            currentQueue = masterQuestionList.filter(item => item.lastStatus === "不正解").map(item => item.id);
+            let incorrects = masterQuestionList.filter(item => item.lastStatus === "不正解").map(item => item.id);
+            incorrects.sort(() => Math.random() - 0.5);
+            currentQueue = incorrects;
         }
 
         if (currentQueue.length > 0) {
@@ -396,7 +397,11 @@
     }
 
     function goToTop() { renderTopScreen(); }
-    function goToPortal() { window.location.href = "../index.html"; }
+    
+    function goToPortal() { 
+        window.location.href = "https://yoshinori620620.github.io/v3-English-for-Elly/index.html"; 
+    }
+    
     function showScreen(screenId) {
         ['top-screen', 'quiz-screen', 'result-screen'].forEach(id => document.getElementById(id).classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
