@@ -58,7 +58,7 @@
         </div>
         <div class="progress-banner" id="progress-summary">全500問中 0問達成（残500問）</div>
         <div class="menu-buttons">
-            <button class="main-btn btn-primary" onclick="startMode('random')">🎲 未回答のみを順番に出題（10問）</button>
+            <button class="main-btn btn-primary" onclick="startMode('random')">🎲 未回答からランダム出題（10問）</button>
             <button class="main-btn" style="background-color: #7F8C8D;" onclick="goToPortal()">🚪 ポータル画面へ戻る</button>
         </div>
         <div class="problem-list" id="problem-card-list"></div>
@@ -102,10 +102,10 @@
         masterQuestionList.push({
             id: i,
             meaning: `【日常会話】No.${i}`,
-            expression: tpl.word,
+            expression: `${tpl.word} (No.${i})`,
             sentence: tpl.q,
             answer: tpl.a,
-            options: [...tpl.o],
+            options: [...tpl.o].sort(() => Math.random() - 0.5),
             translation: tpl.t,
             explanation: `「${tpl.word}」の必須日常フレーズです。`,
             timesPlayed: 0,
@@ -113,7 +113,7 @@
         });
     }
 
-    const STORAGE_KEY = "daily_500_history_v5";
+    const STORAGE_KEY = "daily_500_history_v6";
 
     function loadSavedHistory() {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -166,7 +166,7 @@
             const card = document.createElement('div');
             card.className = 'problem-card';
             card.innerHTML = `
-                <div>第${item.id}問: ${item.expression}</div>
+                <div>第${item.id}問:${item.expression}</div>
                 <div class="status-badge ${badgeClass}">${item.lastStatus}</div>
             `;
             cardListContainer.appendChild(card);
@@ -178,7 +178,7 @@
         queueIndex = 0;
         document.getElementById('app-nav').style.display = 'flex';
 
-        // 🛡️【完全非重複ロジック】
+        // 🎲 未挑戦から完全にランダムシャッフルして10問選出
         let unseen = masterQuestionList.filter(i => i.lastStatus === "未挑戦").map(i => i.id);
         if (unseen.length === 0) {
             alert("全500問クリアしました！");
@@ -196,7 +196,7 @@
         const activeId = currentQueue[queueIndex];
         const data = masterQuestionList.find(item => item.id === activeId);
 
-        document.getElementById('quiz-theme').innerText = `第${data.id}問 : ${data.meaning}`;
+        document.getElementById('quiz-theme').innerText = `第${data.id}問 :${data.meaning}`;
         document.getElementById('quiz-question').innerHTML = data.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
         
         const optionsBox = document.getElementById('quiz-options');
@@ -236,7 +236,8 @@
     }
 
     function goToTop() { renderTopScreen(); }
-    function goToPortal() { window.location.href = "../index.html"; }
+    function goToPortal() { window.location.href = "https://yoshinori620620.github.io/v3-English-for-Elly/index.html"; }
+
     function showScreen(screenId) {
         ['top-screen', 'quiz-screen', 'result-screen'].forEach(id => document.getElementById(id).classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
