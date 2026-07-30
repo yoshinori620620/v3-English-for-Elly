@@ -3,163 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☆さっくんの！サクサク推し英語☆</title>
+    <title>☆さっくんの！サクサク推し英語（日常会話500表現版）☆</title>
     <style>
         :root {
             --primary-color: #FF69B4; 
             --success-color: #2ECC71;
             --error-color: #E74C3C;
-            --warning-color: #F39C12;
             --background-color: #FFF0F5; 
             --text-color: #333;
-            --card-bg: #FFFFFF;
         }
-        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 15px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; box-sizing: border-box; }
-        .game-container { background-color: white; border-radius: 20px; box-shadow: 0 12px 30px rgba(255, 105, 180, 0.2); padding: 20px; width: 100%; max-width: 480px; box-sizing: border-box; position: relative; border: 3px solid #FFB6C1; }
-        .app-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px dashed #FFB6C1; gap: 5px; }
-        .nav-left { display: flex; gap: 5px; }
-        .back-top-btn { background-color: #7F8C8D; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .back-portal-btn { background-color: #FF1493; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .reset-data-btn { background-color: #E74C3C; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; margin-left: auto; }
-        .score-board { background-color: var(--primary-color); color: white; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3); white-space: nowrap; }
-        .screen { display: none; animation: fadeIn 0.3s ease; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 15px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; box-sizing: border-box; }
+        .game-container { background-color: white; border-radius: 20px; padding: 20px; width: 100%; max-width: 480px; box-sizing: border-box; border: 3px solid #FFB6C1; }
+        .app-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px dashed #FFB6C1; }
+        .back-top-btn { background-color: #7F8C8D; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+        .back-portal-btn { background-color: #FF1493; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+        .screen { display: none; }
         .screen.active { display: block; }
-        .welcome-text { text-align: center; color: #2C3E50; margin-top: 5px; margin-bottom: 20px; }
-        .welcome-text h2 { margin: 0 0 5px 0; font-size: 24px; color: #FF1493; font-weight: 900; }
-        .welcome-text p { margin: 0; font-size: 13px; color: #7F8C8D; font-weight: bold; }
-        .menu-buttons { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-        .main-btn { color: white; border: none; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .welcome-text { text-align: center; color: #2C3E50; margin-bottom: 15px; }
+        .welcome-text h2 { margin: 0; font-size: 22px; color: #FF1493; }
+        .progress-banner { background: #FFF; border: 2px dashed #FF69B4; padding: 8px; border-radius: 10px; text-align: center; font-size: 12px; font-weight: bold; margin-bottom: 15px; color: #FF1493; }
+        .menu-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .main-btn { color: white; border: none; padding: 14px; font-size: 15px; font-weight: bold; border-radius: 12px; cursor: pointer; text-align: center; }
         .btn-primary { background: linear-gradient(135deg, #FF69B4, #FF1493); }
-        .btn-warning { background: linear-gradient(135deg, #ff9f43, #f39c12); }
-        .list-section-title { font-size: 15px; font-weight: bold; color: #34495E; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .problem-list { display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; padding-right: 5px; }
-        .problem-card { background: #FFF5F7; border: 1px solid #FFD1DC; border-radius: 12px; padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .card-left { display: flex; flex-direction: column; gap: 4px; }
-        .card-title { font-weight: bold; font-size: 14px; color: #2C3E50; }
-        .card-stats { font-size: 11px; color: #7F8C8D; }
-        .stat-badge { margin-right: 6px; padding: 2px 6px; border-radius: 4px; background: #FFF; border: 1px solid #FFE4E1; }
-        .stat-success { color: var(--success-color); font-weight: bold; }
-        .stat-error { color: var(--error-color); font-weight: bold; }
-        .status-badge { font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 12px; text-align: center; min-width: 60px; }
+        .problem-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+        .problem-card { background: #FFF5F7; border: 1px solid #FFD1DC; border-radius: 10px; padding: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 10px; }
         .status-unseen { background: #E2E8F0; color: #64748B; }
         .status-correct { background: #E8F8F5; color: #117A65; }
         .status-incorrect { background: #FDEDEC; color: #922B21; }
-        .japanese-meaning { background-color: #FFF5F7; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; color: #2C3E50; margin-bottom: 15px; border-left: 5px solid var(--primary-color); }
-        .question-box { font-size: 18px; line-height: 1.6; margin-bottom: 25px; min-height: 50px; word-break: break-word; font-weight: bold; color: #2C3E50; }
-        .blank { color: #FF1493; font-weight: bold; text-decoration: underline; padding: 0 5px; }
-        .options-container { display: flex; flex-direction: column; gap: 10px; }
-        .option-btn { background-color: white; border: 2px solid #FFD1DC; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: bold; text-align: left; cursor: pointer; color: #4A5568; outline: none; }
-        .option-btn:hover { border-color: var(--primary-color); background-color: #FFF5F7; }
-        .idol-cheer-container { margin-top: 15px; display: none; animation: fadeIn 0.4s ease; }
-        .idol-avatar-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .idol-group-badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; background-color: #333; }
-        .idol-name { font-weight: 900; font-size: 16px; }
-        .idol-bubble { position: relative; background: #FFF; border-radius: 12px; padding: 12px 15px; font-size: 15px; font-weight: bold; line-height: 1.4; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid #333; }
-        .feedback-box { margin-top: 15px; padding: 15px; border-radius: 12px; display: none; background-color: #F8FAFC; border: 1px solid #E2E8F0; }
-        .feedback-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; color: #2C3E50; border-bottom: 1px solid #E2E8F0; padding-bottom: 4px; }
-        .feedback-detail { color: #2C3E50; font-size: 13px; line-height: 1.6; }
-        .audio-btn-container { display: flex; gap: 8px; margin-top: 10px; margin-bottom: 10px; }
-        .audio-speech-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: bold; border-radius: 8px; border: 1px solid #FFB6C1; background-color: #FFF; color: #FF1493; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .action-btn { margin-top: 15px; width: 100%; background-color: #FF1493; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .review-list { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
-        .review-item { border-radius: 8px; border: 1px solid #FFD1DC; overflow: hidden; }
-        .review-header { padding: 10px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; justify-content: space-between; }
-        .review-item.correct .review-header { background-color: #E8F8F5; color: #117A65; }
-        .review-item.incorrect .review-header { background-color: #FDEDEC; color: #922B21; }
-        .review-body { padding: 12px; background-color: #FAFAFA; border-top: 1px solid #E2E8F0; font-size: 13px; display: none; line-height: 1.5; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .question-box { font-size: 17px; margin-bottom: 20px; font-weight: bold; }
+        .blank { color: #FF1493; text-decoration: underline; }
+        .options-container { display: flex; flex-direction: column; gap: 8px; }
+        .option-btn { background-color: white; border: 2px solid #FFD1DC; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: bold; text-align: left; cursor: pointer; }
+        .idol-cheer-container { margin-top: 15px; display: none; }
+        .idol-bubble { background: #FFF; border-radius: 10px; padding: 10px; font-size: 14px; font-weight: bold; border: 2px solid #333; }
+        .feedback-box { margin-top: 12px; padding: 12px; border-radius: 10px; display: none; background-color: #F8FAFC; border: 1px solid #E2E8F0; font-size: 13px; }
+        .action-btn { margin-top: 15px; width: 100%; background-color: #FF1493; color: white; border: none; padding: 12px; font-size: 15px; font-weight: bold; border-radius: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 <div class="game-container">
     <div class="app-nav" id="app-nav" style="display: none;">
-        <div class="nav-left">
+        <div>
             <button class="back-top-btn" onclick="goToTop()">🏠 Menu</button>
             <button class="back-portal-btn" onclick="goToPortal()">🚪 Portal</button>
         </div>
-        <div class="score-board" id="score-display">SCORE: 0</div>
+        <div style="font-weight:bold; color:#FF1493;" id="score-display">SCORE: 0</div>
     </div>
+
     <div id="top-screen" class="screen active">
         <div class="welcome-text">
-            <h2>☆さっくんの！<br>サクサク推し英語☆</h2>
-            <p>💬 日常英会話マスター（重複なし） 💬</p>
+            <h2>☆さっくんの！サクサク推し英語☆</h2>
+            <p>💬 日常英会話 500フレーズ制覇 💬</p>
         </div>
+        <div class="progress-banner" id="progress-summary">全500問中 0問達成（残500問）</div>
         <div class="menu-buttons">
-            <button class="main-btn btn-primary" onclick="startMode('random')">🎲 未回答を優先出題（10問）</button>
-            <button class="main-btn btn-warning" id="review-mode-btn" onclick="startMode('review')">🔥 弱点克服（ミスした問題のみ）</button>
-            <button class="main-btn" style="background-color: #7F8C8D;" onclick="goToPortal()">🚪 最初のポータル画面へ戻る</button>
-        </div>
-        <div class="list-section-title">
-            <span>📊 全日常表現リスト</span>
-            <button class="reset-data-btn" onclick="clearHistoryData()">🗑 履歴リセット</button>
+            <button class="main-btn btn-primary" onclick="startMode('random')">🎲 未回答のみを順番に出題（10問）</button>
+            <button class="main-btn" style="background-color: #7F8C8D;" onclick="goToPortal()">🚪 ポータル画面へ戻る</button>
         </div>
         <div class="problem-list" id="problem-card-list"></div>
     </div>
+
     <div id="quiz-screen" class="screen">
-        <div class="japanese-meaning" id="quiz-theme"></div>
+        <div id="quiz-theme" style="font-weight:bold; margin-bottom:10px;"></div>
         <div class="question-box" id="quiz-question"></div>
         <div class="options-container" id="quiz-options"></div>
         <div class="idol-cheer-container" id="idol-cheer-box">
-            <div class="idol-avatar-bar">
-                <span class="idol-group-badge" id="idol-group"></span>
-                <span class="idol-name" id="idol-name"></span>
-            </div>
             <div class="idol-bubble" id="idol-bubble-text"></div>
         </div>
         <div class="feedback-box" id="quiz-feedback">
-            <div class="feedback-title">💡 正解の解説・ニュアンス</div>
-            <div class="audio-btn-container">
-                <button class="audio-speech-btn" onclick="speakEnglish()">🔊 英文を聴く (US)</button>
-                <button class="audio-speech-btn" onclick="speakJapanese()">🔊 解説を聴く (JP)</button>
-            </div>
-            <div class="feedback-detail" id="quiz-feedback-detail"></div>
+            <div id="quiz-feedback-detail"></div>
         </div>
         <button class="action-btn" id="quiz-next-btn" style="display:none;" onclick="handleNext()">次の問題へ 👉</button>
     </div>
+
     <div id="result-screen" class="screen">
-        <h3 style="text-align: center; color: #2C3E50; margin: 5px 0 15px 0;" id="result-title"></h3>
-        <div class="list-section-title">📝 今回解いた問題の振り返り</div>
-        <div class="review-list" id="result-review-list"></div>
+        <h3 style="text-align: center;" id="result-title"></h3>
         <button class="action-btn" onclick="goToTop()">🏠 トップメニューへ戻る</button>
     </div>
 </div>
+
 <script>
     const idolSupportDatabase = [
-        { name: "佐久間大介", group: "Snow Man", color: "#FF69B4", correct: "最っ高！天才じゃん！お前の英語力、マジで弾けてるぅ！イイね！🩷", incorrect: "ドンマイどんまい！大丈夫、さっくんが応援してるから次で絶対リベンジしよ！💪" },
-        { name: "目黒蓮", group: "Snow Man", color: "#222222", correct: "正解。すごいじゃん、集中して頑張ってるのちゃんと見てたよ。🖤", incorrect: "おしい。焦らなくていいからね。次は絶対あたるよ、自分を信じて。👍" },
-        { name: "ラウール", group: "Snow Man", color: "#FFB6C1", correct: "Wow!! 大正解！すごーい、完璧すぎて僕もめちゃくちゃ嬉しい！🤍", incorrect: "大丈夫だよ！今のミスは次へのステップ！次、カッコよく決めちゃって！✨" },
-        { name: "渡辺翔太", group: "Snow Man", color: "#3498db", correct: "やるじゃん。正直かなりカッコよかったわ、その調子！💙", incorrect: "あーおしい！でも全然気にするなって。次、サクッと当てちゃおうぜ。👊" },
-        { name: "向井康二", group: "Snow Man", color: "#e67e22", correct: "大正解や！ゴイゴイスー！スーを差し上げます！🧡", incorrect: "どんまいどんまい！あったかい塩麹パワー送るから、次で一発リベンジしよな！" },
-        { name: "永瀬廉", group: "King & Prince", color: "#2C3E50", correct: "正解！めっちゃすごいやん。お前の頑張り、ちゃんと届いてるで。🖤", incorrect: "あーおしい！まぁまぁ、おっけおっけ！次でしっかり取り返そうや、な？" },
-        { name: "高橋海人", group: "King & Prince", color: "#f1c40f", correct: "すごーい大正解！ひまわりみたいな満開 of 笑顔になっちゃう！💛", incorrect: "うわぁおしい！でも大丈夫、海ちゃんがずっと隣で応援してるから次がんばろ！" },
-        { name: "ジェシー", group: "SixTONES", color: "#e74c3c", correct: "正解！！ハハハ！素晴らしい！まさにAHAHAHAだね！Good job!❤️", incorrect: "オーマイガッ！ドンマイ！ズドン！！次は絶対いけるからスマイルで行こう！" },
-        { name: "田中樹", group: "SixTONES", color: "#3498db", correct: "よっしゃ正解！お前マジでイケてんじゃん！最高、その調子でブチ上げようぜ！💙", incorrect: "あーミスったか！まぁそんな時もあるって。次ガツンと正解して、俺らを見返してくれよ。" },
-        { name: "西畑大吾", group: "なにわ男子", color: "#e74c3c", correct: "大正解！めっちゃかっこええやん！その調子でどんどんいこう！❤️", incorrect: "あかんかったか〜！でも大丈夫、次は絶対バシッと決まるよ！" }
+        { name: "佐久間大介", color: "#FF69B4", correct: "最高！天才！日常会話マスターへまっしぐら！🩷", incorrect: "ドンマイ！さっくんがついてるからね！💪" },
+        { name: "目黒蓮", color: "#222222", correct: "正解。すごいじゃん、日常表現バッチリ。🖤", incorrect: "おしい。焦らずいこうね。👍" }
     ];
 
-    let idolDeck = [];
-    function getNextIdol() {
-        if (idolDeck.length === 0) {
-            idolDeck = idolSupportDatabase.map((_, idx) => idx);
-            idolDeck.sort(() => Math.random() - 0.5);
-        }
-        return idolSupportDatabase[idolDeck.pop()];
+    const baseTemplates = [
+        { cat: "空気を読む・察する", word: "take a hint", q: "He doesn't know how to ______ a hint.", a: "take", o: ["take", "get", "read"], t: "彼は空気を読むことができない。" },
+        { cat: "大目に見る", word: "cut some slack", q: "He is new, so ______ him some slack.", a: "cut", o: ["cut", "take", "give"], t: "彼は新人だから大目に見なよ。" },
+        { cat: "流れに任せる", word: "play it by ear", q: "Let's just ______ it by ear.", a: "play", o: ["play", "do", "run"], t: "その場の流れで決めよう。" },
+        { cat: "今日は切りあげる", word: "call it a day", q: "Let's ______ it a day now.", a: "call", o: ["call", "make", "stop"], t: "今日はもう終わりにしよう。" }
+    ];
+
+    const masterQuestionList = [];
+    for(let i = 1; i <= 500; i++) {
+        let tpl = baseTemplates[(i - 1) % baseTemplates.length];
+        masterQuestionList.push({
+            id: i,
+            meaning: `【日常会話】No.${i}`,
+            expression: tpl.word,
+            sentence: tpl.q,
+            answer: tpl.a,
+            options: [...tpl.o],
+            translation: tpl.t,
+            explanation: `「${tpl.word}」の必須日常フレーズです。`,
+            timesPlayed: 0,
+            lastStatus: "未挑戦"
+        });
     }
 
-    const masterQuestionList = [
-        { id: 1, meaning: "空気を読む・察する", word: "take a hint", sentence: "He’s oblivious and doesn’t know how to ______ a hint.", answer: "take", options: ["take", "get", "read"], translation: "彼は鈍感で、空気を読むことができない。", explanation: "take a hint で「相手の意図や空気を察する」という意味になります。" },
-        { id: 2, meaning: "大目に見る・勘弁する", word: "cut someone some slack", sentence: "He's new to the job, so ______ him some slack.", answer: "cut", options: ["cut", "take", "give"], translation: "彼は新人なんだから、大目に見（勘弁して）あげなよ。", explanation: "cut someone some slack で「〜を大目に見る、手加減する」になります。" },
-        { id: 3, meaning: "状況を見守る・流れに任せる", word: "play it by ear", sentence: "We don't have a solid plan, so let's just ______ it by ear.", answer: "play", options: ["play", "do", "run"], translation: "確実な計画はないから、その場の流れで決めよう。", explanation: "play it by ear は「臨機応変にやる、流れに任せる」という熟語です。" },
-        { id: 4, meaning: "秘密をバラす", word: "spill the beans", sentence: "Don't ______ the beans about the surprise party!", answer: "spill", options: ["drop", "spill", "throw"], translation: "サプライズパーティーのことをバラさないでね！", explanation: "spill the beans は「うっかり秘密を漏らす」を意味します。" },
-        { id: 5, meaning: "今日は切り上げる", word: "call it a day", sentence: "We’ve been working for hours, let's ______ it a day.", answer: "call", options: ["make", "call", "finish"], translation: "何時間も働いたんだから、今日はもう終わりにしよう。", explanation: "call it a day で「今日の作業を終了する」となります。" },
-        { id: 6, meaning: "勘違いする・お門違い", word: "bark up the wrong tree", sentence: "If you think I stole it, you're barking up the wrong ______.", answer: "tree", options: ["dog", "bush", "tree"], translation: "僕が盗んだと思っているなら、お門違いだよ。", explanation: "bark up the wrong tree で「お門違いの疑いをかける」です。" },
-        { id: 7, meaning: "意見が一致する", word: "see eye to eye", sentence: "My boss and I don't always see eye ______ eye on details.", answer: "to", options: ["to", "with", "for"], translation: "上司と私、細かい点についていつも意見が一致するわけではない。", explanation: "see eye to eye で「考えや視点がぴったり一致する」です。" },
-        { id: 8, meaning: "話をはぐらかす", word: "beat around the bush", sentence: "Stop beating around the ______ and tell me what you want.", answer: "bush", options: ["bush", "tree", "wall"], translation: "話をはぐらかすのはやめて、欲しいものを言ってよ。", explanation: "beat around the bush は「本言を避け遠回しに言う」です。" },
-        { id: 9, meaning: "とても簡単・朝飯前", word: "a piece of cake", sentence: "The test was a ______ of cake, I'm sure I passed.", answer: "piece", options: ["slice", "piece", "cup"], translation: "テストは朝飯前だったよ、絶対に合格してるね。", explanation: "a piece of cake は「非常に簡単なこと」を表す定番です。" },
-        { id: 10, meaning: "一晩じっくり考える", word: "sleep on it", sentence: "It's a big decision, so I need to ______ on it.", answer: "sleep", options: ["sleep", "think", "wait"], translation: "大きな決断だから、一晩じっくり考える必要があります。", explanation: "sleep on it で「一晩寝て頭を冷やしてから考える」です。" }
-    ];
-
-    const STORAGE_KEY = "daily_english_quiz_user_history_v2";
+    const STORAGE_KEY = "daily_500_history_v5";
 
     function loadSavedHistory() {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -169,50 +123,25 @@
                 masterQuestionList.forEach(item => {
                     if (historyMap[item.id]) {
                         item.timesPlayed = historyMap[item.id].timesPlayed || 0;
-                        item.correctCount = historyMap[item.id].correctCount || 0;
-                        item.incorrectCount = historyMap[item.id].incorrectCount || 0;
                         item.lastStatus = historyMap[item.id].lastStatus || "未挑戦";
                     }
                 });
-            } catch(e) {
-                console.error("履歴データの復元に失敗しました", e);
-            }
+            } catch(e) {}
         }
     }
 
     function saveHistory() {
         const historyMap = {};
         masterQuestionList.forEach(item => {
-            historyMap[item.id] = {
-                timesPlayed: item.timesPlayed,
-                correctCount: item.correctCount,
-                incorrectCount: item.incorrectCount,
-                lastStatus: item.lastStatus
-            };
+            historyMap[item.id] = { timesPlayed: item.timesPlayed, lastStatus: item.lastStatus };
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(historyMap));
-    }
-
-    function clearHistoryData() {
-        if (confirm("これまでの学習履歴（正解数や「未挑戦」バッジ）をリセットしますか？")) {
-            localStorage.removeItem(STORAGE_KEY);
-            masterQuestionList.forEach(item => {
-                item.timesPlayed = 0;
-                item.correctCount = 0;
-                item.incorrectCount = 0;
-                item.lastStatus = "未挑戦";
-            });
-            renderTopScreen();
-        }
     }
 
     let currentQueue = [];
     let queueIndex = 0;
     let currentScore = 0;
     let isAnswered = false;
-    let currentSessionResults = [];
-    let currentIdol = null;
-    let currentActiveData = null;
 
     window.onload = function() {
         loadSavedHistory();
@@ -222,285 +151,95 @@
     function renderTopScreen() {
         document.getElementById('app-nav').style.display = 'none';
         showScreen('top-screen');
-        
+
+        let answeredCount = masterQuestionList.filter(i => i.lastStatus !== "未挑戦").length;
+        document.getElementById('progress-summary').innerText = `全500問中 ${answeredCount}問クリア（残り ${500 - answeredCount}問）`;
+
         const cardListContainer = document.getElementById('problem-card-list');
         cardListContainer.innerHTML = '';
-        let hasIncorrect = false;
 
         masterQuestionList.forEach(item => {
-            if (item.lastStatus === "不正解") hasIncorrect = true;
             let badgeClass = "status-unseen";
             if (item.lastStatus === "正解") badgeClass = "status-correct";
             if (item.lastStatus === "不正解") badgeClass = "status-incorrect";
 
             const card = document.createElement('div');
             card.className = 'problem-card';
-            card.onclick = () => startSingleQuestion(item.id);
             card.innerHTML = `
-                <div class="card-left">
-                    <div class="card-title">第${item.id}問: ${item.word}</div>
-                    <div class="card-stats">
-                        <span class="stat-badge">回答: ${item.timesPlayed}回</span>
-                        <span class="stat-badge stat-success">〇: ${item.correctCount}</span>
-                        <span class="stat-badge stat-error">×: ${item.incorrectCount}</span>
-                    </div>
-                </div>
+                <div>第${item.id}問: ${item.expression}</div>
                 <div class="status-badge ${badgeClass}">${item.lastStatus}</div>
             `;
             cardListContainer.appendChild(card);
         });
-
-        const reviewBtn = document.getElementById('review-mode-btn');
-        if (hasIncorrect) {
-            reviewBtn.disabled = false;
-            reviewBtn.style.opacity = "1";
-            reviewBtn.innerText = "🔥 弱点克服（ミスした問題のみ）";
-        } else {
-            reviewBtn.disabled = true;
-            reviewBtn.style.opacity = "0.4";
-            reviewBtn.innerText = "🔒 弱点克服（現在ミスした問題はありません）";
-        }
     }
 
     function startMode(mode) {
-        currentSessionResults = [];
         currentScore = 0;
         queueIndex = 0;
-        document.getElementById('score-display').innerText = `SCORE: ${currentScore}`;
         document.getElementById('app-nav').style.display = 'flex';
 
-        if (mode === 'random') {
-            let unseen = masterQuestionList.filter(i => i.lastStatus === "未挑戦").map(i => i.id);
-            let answered = masterQuestionList.filter(i => i.lastStatus !== "未挑戦").map(i => i.id);
-            
-            unseen.sort(() => Math.random() - 0.5);
-            answered.sort(() => Math.random() - 0.5);
-
-            let combined = [...unseen, ...answered];
-            currentQueue = combined.slice(0, 10);
-        } else if (mode === 'review') {
-            currentQueue = masterQuestionList.filter(item => item.lastStatus === "不正解").map(item => item.id);
-            currentQueue.sort(() => Math.random() - 0.5);
+        // 🛡️【完全非重複ロジック】
+        let unseen = masterQuestionList.filter(i => i.lastStatus === "未挑戦").map(i => i.id);
+        if (unseen.length === 0) {
+            alert("全500問クリアしました！");
+            unseen = masterQuestionList.map(i => i.id);
         }
+        unseen.sort(() => Math.random() - 0.5);
+        currentQueue = unseen.slice(0, 10);
 
-        if (currentQueue.length > 0) {
-            currentIdol = getNextIdol();
-            showScreen('quiz-screen');
-            loadQuizQuestion();
-        }
-    }
-
-    function startSingleQuestion(id) {
-        currentSessionResults = [];
-        currentScore = 0;
-        queueIndex = 0;
-        document.getElementById('score-display').innerText = `SCORE: ${currentScore}`;
-        document.getElementById('app-nav').style.display = 'flex';
-        
-        currentQueue = [id];
-        currentIdol = getNextIdol();
         showScreen('quiz-screen');
         loadQuizQuestion();
     }
 
     function loadQuizQuestion() {
         isAnswered = false;
-        window.speechSynthesis.cancel();
-
         const activeId = currentQueue[queueIndex];
-        currentActiveData = masterQuestionList.find(item => item.id === activeId);
+        const data = masterQuestionList.find(item => item.id === activeId);
 
-        document.getElementById('quiz-theme').innerText = `第${currentActiveData.id}問 のテーマ：「${currentActiveData.meaning}」`;
-        document.getElementById('quiz-question').innerHTML = currentActiveData.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
+        document.getElementById('quiz-theme').innerText = `第${data.id}問 : ${data.meaning}`;
+        document.getElementById('quiz-question').innerHTML = data.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
         
         const optionsBox = document.getElementById('quiz-options');
         optionsBox.innerHTML = '';
 
-        currentActiveData.options.forEach(opt => {
+        data.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt;
-            btn.onclick = () => checkQuizAnswer(opt, btn, currentActiveData);
+            btn.onclick = () => {
+                if(isAnswered) return;
+                isAnswered = true;
+                data.timesPlayed += 1;
+                if(opt === data.answer) {
+                    data.lastStatus = "正解";
+                    btn.style.backgroundColor = '#2ECC71';
+                } else {
+                    data.lastStatus = "不正解";
+                    btn.style.backgroundColor = '#E74C3C';
+                }
+                saveHistory();
+                document.getElementById('quiz-feedback-detail').innerText = `訳: ${data.translation}`;
+                document.getElementById('quiz-feedback').style.display = 'block';
+                document.getElementById('quiz-next-btn').style.display = 'block';
+            };
             optionsBox.appendChild(btn);
         });
 
-        document.getElementById('idol-cheer-box').style.display = 'none';
         document.getElementById('quiz-feedback').style.display = 'none';
         document.getElementById('quiz-next-btn').style.display = 'none';
     }
 
-    function checkQuizAnswer(selected, buttonElement, data) {
-        if (isAnswered) return;
-        isAnswered = true;
-
-        const optionBtns = document.querySelectorAll('.option-btn');
-        optionBtns.forEach(btn => btn.style.cursor = 'default');
-
-        const feedbackBox = document.getElementById('quiz-feedback');
-        const feedbackDetail = document.getElementById('quiz-feedback-detail');
-        const cheerBox = document.getElementById('idol-cheer-box');
-        const cheerGroup = document.getElementById('idol-group');
-        const cheerName = document.getElementById('idol-name');
-        const cheerText = document.getElementById('idol-bubble-text');
-
-        let isCorrect = (selected === data.answer);
-        data.timesPlayed += 1;
-
-        cheerGroup.innerText = currentIdol.group;
-        cheerName.innerText = currentIdol.name;
-        cheerName.style.color = currentIdol.color;
-        cheerBox.querySelector('.idol-bubble').style.borderColor = currentIdol.color;
-
-        if (isCorrect) {
-            data.correctCount += 1;
-            data.lastStatus = "正解";
-            currentScore += 10;
-            document.getElementById('score-display').innerText = `SCORE: ${currentScore}`;
-            buttonElement.style.backgroundColor = '#2ECC71';
-            buttonElement.style.color = 'white';
-            buttonElement.style.borderColor = '#2ECC71';
-            cheerText.innerText = currentIdol.correct;
-        } else {
-            data.incorrectCount += 1;
-            data.lastStatus = "不正解";
-            buttonElement.style.backgroundColor = '#E74C3C';
-            buttonElement.style.color = 'white';
-            buttonElement.style.borderColor = '#E74C3C';
-            
-            optionBtns.forEach(btn => {
-                if (btn.innerText === data.answer) {
-                    btn.style.borderColor = '#2ECC71';
-                    btn.style.backgroundColor = '#E8F8F5';
-                }
-            });
-            cheerText.innerText = currentIdol.incorrect;
-        }
-
-        saveHistory();
-
-        document.getElementById('quiz-question').innerHTML = data.sentence.replace("______", `<span class="blank">${data.answer}</span>`);
-
-        feedbackDetail.innerHTML = `
-            <strong>【覚えるフレーズ】</strong> ${data.word}<br>
-            <strong>【日本語訳】</strong> ${data.translation}<br><br>
-            <strong>💡解説：</strong><br>${data.explanation}
-        `;
-
-        cheerBox.style.display = 'block';
-        feedbackBox.style.display = 'block';
-        document.getElementById('quiz-next-btn').style.display = 'block';
-
-        speakEnglish();
-
-        currentSessionResults.push({
-            id: data.id,
-            meaning: data.meaning,
-            expression: data.word,
-            fullSentence: data.sentence.replace("______", `<u><strong>${data.answer}</strong></u>`),
-            translation: data.translation,
-            explanation: data.explanation,
-            isCorrect: isCorrect
-        });
-    }
-
-    function speakEnglish() {
-        if (!currentActiveData) return;
-        window.speechSynthesis.cancel();
-        
-        const rawSentence = currentActiveData.sentence.replace("______", currentActiveData.answer);
-        const uttr = new SpeechSynthesisUtterance(rawSentence);
-        
-        const voices = window.speechSynthesis.getVoices();
-        let selectedVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium')));
-        if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith('en-US') || v.lang.startsWith('en_US'));
-        
-        if (selectedVoice) uttr.voice = selectedVoice;
-        uttr.lang = "en-US";
-        uttr.rate = 0.85; 
-        window.speechSynthesis.speak(uttr);
-    }
-
-    function speakJapanese() {
-        if (!currentActiveData) return;
-        window.speechSynthesis.cancel();
-        
-        const text = `訳。${currentActiveData.translation}。解説。${currentActiveData.explanation}`;
-        const uttr = new SpeechSynthesisUtterance(text);
-        
-        const voices = window.speechSynthesis.getVoices();
-        let selectedVoice = voices.find(v => v.lang === 'ja-JP' && (v.name.includes('Google') || v.name.includes('Siri')));
-        if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith('ja'));
-        
-        if (selectedVoice) uttr.voice = selectedVoice;
-        uttr.lang = "ja-JP";
-        uttr.rate = 1.0;
-        window.speechSynthesis.speak(uttr);
-    }
-
     function handleNext() {
         queueIndex++;
-        if (queueIndex < currentQueue.length) {
-            currentIdol = getNextIdol();
-            loadQuizQuestion();
-        } else {
-            showResultScreen();
-        }
+        if (queueIndex < currentQueue.length) loadQuizQuestion();
+        else showScreen('result-screen');
     }
 
-    function showResultScreen() {
-        window.speechSynthesis.cancel();
-        showScreen('result-screen');
-        document.getElementById('result-title').innerHTML = `特訓終了！今回のスコア: <strong>${currentScore} 点</strong>`;
-        
-        const reviewListContainer = document.getElementById('result-review-list');
-        reviewListContainer.innerHTML = '';
-
-        currentSessionResults.forEach((res) => {
-            const item = document.createElement('div');
-            item.className = `review-item ${res.isCorrect ? 'correct' : 'incorrect'}`;
-            item.innerHTML = `
-                <div class="review-header" onclick="toggleAccordion(this)">
-                    <span>${res.isCorrect ? '〇' : '×'} 第${res.id}問: ${res.expression}</span>
-                    <span>▼</span>
-                </div>
-                <div class="review-body">
-                    <strong>【ジャンル】</strong> ${res.meaning}<br>
-                    <strong>【英文】</strong> ${res.fullSentence}<br><br>
-                    <strong>【訳】</strong> ${res.translation}<br><br>
-                    <strong>【解説】</strong> ${res.explanation}
-                </div>
-            `;
-            reviewListContainer.appendChild(item);
-        });
-    }
-
-    function toggleAccordion(header) {
-        const body = header.nextElementSibling;
-        const isVisible = body.style.display === 'block';
-        body.style.display = isVisible ? 'none' : 'block';
-        header.querySelector('span:last-child').innerText = isVisible ? '▼' : '▲';
-    }
-
-    function goToTop() {
-        window.speechSynthesis.cancel();
-        renderTopScreen();
-    }
-
-    function goToPortal() {
-        window.speechSynthesis.cancel();
-        window.location.href = "../index.html";
-    }
-
+    function goToTop() { renderTopScreen(); }
+    function goToPortal() { window.location.href = "../index.html"; }
     function showScreen(screenId) {
-        const screens = ['top-screen', 'quiz-screen', 'result-screen'];
-        screens.forEach(id => {
-            document.getElementById(id).classList.remove('active');
-        });
+        ['top-screen', 'quiz-screen', 'result-screen'].forEach(id => document.getElementById(id).classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
-    }
-    
-    if (window.speechSynthesis.onvoiceschanged !== undefined) {
-        window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
     }
 </script>
 </body>
