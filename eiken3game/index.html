@@ -19,7 +19,7 @@
 
 <div class="game-container">
     <div class="app-nav">
-        <button onclick="window.location.href='../index.html'" style="background:#FF1493; color:white; border:none; padding:6px 12px; border-radius:8px; font-weight:bold;">🚪 Portal</button>
+        <button onclick="goToPortal()" style="background:#FF1493; color:white; border:none; padding:6px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">🚪 Portal</button>
         <div id="score-display" style="font-weight:bold; color:#FF1493;">SCORE: 0</div>
     </div>
 
@@ -37,7 +37,6 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 全500問自動生成
     const baseTemplates = [
         { meaning: "【重要単語】", sentence: "This castle was built in the 15th ______.", answer: "century", options: ["century", "culture", "season"], translation: "このお城は15世紀に建てられました。" },
         { meaning: "【重要動詞】", sentence: "I ______ with your plan.", answer: "agree", options: ["agree", "decide", "think"], translation: "私はあなたの計画に同意します。" }
@@ -56,7 +55,7 @@
         });
     }
 
-    const STORAGE_KEY = "game_500_history_v5";
+    const STORAGE_KEY = "game_500_history_v6";
     function getPlayedSet() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return saved ? new Set(JSON.parse(saved)) : new Set();
@@ -76,6 +75,7 @@
             localStorage.removeItem(STORAGE_KEY);
             unseen = masterQuestionList.map(q => q.id);
         }
+        // 🎲 完全にランダムシャッフル
         unseen.sort(() => Math.random() - 0.5);
         unplayedQueue = unseen;
     }
@@ -142,6 +142,10 @@
         bird.y = 100; bird.velocity = 0;
         gameState = "PLAYING";
         setupQuestion();
+    }
+
+    function goToPortal() { 
+        window.location.href = "https://yoshinori620620.github.io/v3-English-for-Elly/index.html"; 
     }
 
     resetShuffleQueue();
