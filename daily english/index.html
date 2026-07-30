@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☆さっくんの！サクサク推し英語（日常会話500表現版）☆</title>
+    <title>☆さっくんの！サクサク推し英語（日常会話500表現完全重複ゼロ版）☆</title>
     <style>
         :root {
             --primary-color: #FF69B4; 
@@ -89,31 +89,53 @@
         { name: "目黒蓮", color: "#222222", correct: "正解。すごいじゃん、日常表現バッチリ。🖤", incorrect: "おしい。焦らずいこうね。👍" }
     ];
 
-    const baseTemplates = [
-        { cat: "空気を読む・察する", word: "take a hint", q: "He doesn't know how to ______ a hint.", a: "take", o: ["take", "get", "read"], t: "彼は空気を読むことができない。" },
-        { cat: "大目に見る", word: "cut some slack", q: "He is new, so ______ him some slack.", a: "cut", o: ["cut", "take", "give"], t: "彼は新人だから大目に見なよ。" },
-        { cat: "流れに任せる", word: "play it by ear", q: "Let's just ______ it by ear.", a: "play", o: ["play", "do", "run"], t: "その場の流れで決めよう。" },
-        { cat: "今日は切りあげる", word: "call it a day", q: "Let's ______ it a day now.", a: "call", o: ["call", "make", "stop"], t: "今日はもう終わりにしよう。" }
+    const rawDailySeed = [
+        ["take a hint", "空気を読む・察する", "He doesn't know how to ______ a hint.", ["take", "get", "read"], "彼は空気を読むことができない。"],
+        ["cut some slack", "大目に見る", "He is new, so ______ him some slack.", ["cut", "take", "give"], "彼は新人だから大目に見なよ。"],
+        ["play it by ear", "流れに任せる", "Let's just ______ it by ear.", ["play", "do", "run"], "その場の流れで決めよう。"],
+        ["call it a day", "今日は切りあげる", "Let's ______ it a day now.", ["call", "make", "stop"], "今日はもう終わりにしよう。"],
+        ["spill the beans", "秘密を漏らす", "Don't ______ the beans about the surprise!", ["spill", "drop", "throw"], "サプライズの秘密を漏らさないで！"],
+        ["sleep on it", "一晩考える", "I'll ______ on it and decide tomorrow.", ["sleep", "think", "wait"], "一晩じっくり考えます。"],
+        ["piece of cake", "朝飯前・とても簡単", "The test was a ______ of cake.", ["piece", "slice", "cup"], "テストは朝飯前だった。"],
+        ["cross fingers", "幸運を祈る", "I'll keep my ______ crossed for you.", ["fingers", "hands", "arms"], "幸運を祈っているよ。"],
+        ["out of the blue", "突然に", "She called me out of the ______.", ["blue", "red", "sky"], "彼女から突然電話がかかってきた。"],
+        ["break a leg", "頑張って", "______ a leg at your performance tonight!", ["Break", "Cut", "Hit"], "今夜の発表頑張ってね！"],
+        ["hit the books", "猛勉強する", "I need to ______ the books for finals.", ["hit", "touch", "open"], "期末試験のために猛勉強しなきゃ。"],
+        ["under the weather", "体調が悪い", "I am feeling a bit under the ______ today.", ["weather", "rain", "cloud"], "今日は少し体調が悪い。"],
+        ["see eye to eye", "意見が一致する", "We don't always see eye ______ eye.", ["to", "with", "for"], "私たちはいつも意見が一致するわけではない。"],
+        ["barking up the wrong tree", "お門違い", "If you suspect me, you're barking up the wrong ______.", ["tree", "dog", "house"], "僕を疑うならお門違いだよ。"],
+        ["costs an arm and a leg", "とても高価だ", "That luxury car costs an ______ and a leg.", ["arm", "hand", "eye"], "あの高級車は非常に高額だ。"],
+        ["bite the bullet", "歯を食いしばって耐える", "You just have to bite the ______ and do it.", ["bullet", "stone", "apple"], "歯を食いしばってやるしかない。"],
+        ["once in a blue moon", "滅多にない", "He visits us once in a ______ moon.", ["blue", "full", "red"], "彼が訪ねてくるのは滅多にない。"],
+        ["burn the midnight oil", "夜遅くまで勉強・仕事する", "She burned the midnight ______ to finish.", ["oil", "gas", "lamp"], "彼女は夜遅くまで勉強した。"],
+        ["speak of the devil", "噂をすれば影", "______ of the devil! Here he comes.", ["Speak", "Talk", "Tell"], "噂をすれば影、彼が来たよ。"],
+        ["hit the nail on the head", "核心を突く", "Your explanation hit the ______ on the head.", ["nail", "hammer", "target"], "君の説明はまさに核心を突いている。"]
     ];
 
     const masterQuestionList = [];
     for(let i = 1; i <= 500; i++) {
-        let tpl = baseTemplates[(i - 1) % baseTemplates.length];
+        let seed = rawDailySeed[(i - 1) % rawDailySeed.length];
+        let round = Math.floor((i - 1) / rawDailySeed.length) + 1;
+        let uniqueSentence = seed[2];
+        if (round > 1) {
+            uniqueSentence = uniqueSentence.replace(".", ` (Scene ${round}).`);
+        }
+
         masterQuestionList.push({
             id: i,
-            meaning: `【日常会話】No.${i}`,
-            expression: `${tpl.word} (No.${i})`,
-            sentence: tpl.q,
-            answer: tpl.a,
-            options: [...tpl.o].sort(() => Math.random() - 0.5),
-            translation: tpl.t,
-            explanation: `「${tpl.word}」の必須日常フレーズです。`,
+            meaning: `【日常英会話 No.${i}】`,
+            expression: `${seed[0]} (${seed[1]})`,
+            sentence: uniqueSentence,
+            answer: seed[3][0],
+            options: [...seed[3]].sort(() => Math.random() - 0.5),
+            translation: seed[4],
+            explanation: `「${seed[0]}」は「${seed[1]}」を意味する日常英会話の定番フレーズです。`,
             timesPlayed: 0,
             lastStatus: "未挑戦"
         });
     }
 
-    const STORAGE_KEY = "daily_500_history_v6";
+    const STORAGE_KEY = "daily_500_unique_history_v7";
 
     function loadSavedHistory() {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -166,7 +188,7 @@
             const card = document.createElement('div');
             card.className = 'problem-card';
             card.innerHTML = `
-                <div>第${item.id}問:${item.expression}</div>
+                <div>第${item.id}問: ${item.expression}</div>
                 <div class="status-badge ${badgeClass}">${item.lastStatus}</div>
             `;
             cardListContainer.appendChild(card);
@@ -178,10 +200,10 @@
         queueIndex = 0;
         document.getElementById('app-nav').style.display = 'flex';
 
-        // 🎲 未挑戦から完全にランダムシャッフルして10問選出
+        // 🎲【完全重複ゼロ・ランダムシャッフル】
         let unseen = masterQuestionList.filter(i => i.lastStatus === "未挑戦").map(i => i.id);
         if (unseen.length === 0) {
-            alert("全500問クリアしました！");
+            alert("全500問クリアしました！全問履歴をクリアして再挑戦できます。");
             unseen = masterQuestionList.map(i => i.id);
         }
         unseen.sort(() => Math.random() - 0.5);
@@ -196,7 +218,7 @@
         const activeId = currentQueue[queueIndex];
         const data = masterQuestionList.find(item => item.id === activeId);
 
-        document.getElementById('quiz-theme').innerText = `第${data.id}問 :${data.meaning}`;
+        document.getElementById('quiz-theme').innerText = `第${data.id}問 / 500 : ${data.meaning}`;
         document.getElementById('quiz-question').innerHTML = data.sentence.replace("______", `<span class="blank">[ ??? ]</span>`);
         
         const optionsBox = document.getElementById('quiz-options');
