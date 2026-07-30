@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☆さっくんの！サクサク推し英語 - アクションゲーム500問完全重複ゼロ版☆</title>
+    <title>☆さっくんの！サクサク推し英語 - アクションゲーム500問完全独立版☆</title>
     <style>
         :root { --primary-color: #FF69B4; --success-color: #2ECC71; --error-color: #E74C3C; }
         body { font-family: sans-serif; background-color: #FFF0F5; margin: 0; padding: 10px; display: flex; justify-content: center; }
@@ -53,23 +53,17 @@
     const masterQuestionList = [];
     for(let i = 1; i <= 500; i++) {
         let seed = rawGameSeed[(i - 1) % rawGameSeed.length];
-        let round = Math.floor((i - 1) / rawGameSeed.length) + 1;
-        let sentenceText = seed[2];
-        if (round > 1) {
-            sentenceText = sentenceText.replace(".", ` (Stage ${round}).`);
-        }
-
         masterQuestionList.push({
             id: i,
-            meaning: `【英検3級ゲーム No.${i}】`,
-            sentence: sentenceText,
+            meaning: `【英検3級アクション No.${i}】`,
+            sentence: seed[2],
             answer: seed[3][0],
             options: [...seed[3]],
             translation: seed[1]
         });
     }
 
-    const STORAGE_KEY = "game_500_unique_history_v7";
+    const STORAGE_KEY = "game_500_independent_v8";
     function getPlayedSet() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return saved ? new Set(JSON.parse(saved)) : new Set();
